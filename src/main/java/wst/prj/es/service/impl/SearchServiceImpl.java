@@ -4,17 +4,18 @@ package wst.prj.es.service.impl;
  */
 
 import net.sf.json.JSONArray;
-import org.apache.commons.collections.map.HashedMap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wst.prj.es.common.RangeOperator;
 import wst.prj.es.common.SearchOperator;
 import wst.prj.es.common.SearchType;
+import wst.prj.es.pojo.AggregationParam;
 import wst.prj.es.pojo.ElasticClient;
 import wst.prj.es.pojo.Pagination;
 import wst.prj.es.pojo.QueryParam;
@@ -43,7 +44,7 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName) {
-        return query(indices, types, pagination, returnFields, objectName, null);
+        return query(indices, types, pagination, returnFields, objectName, null,null);
     }
 
 
@@ -61,19 +62,39 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams);
+        return query(indices, types, pagination, returnFields, objectName, queryParams,null);
+    }
+
+    /**
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @param aggregationParams
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/3/24 17:41
+     **/
+    @Override
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams) {
+        return query(indices, types, pagination, returnFields, objectName, queryParams,aggregationParams);
     }
 
     /**
      * @param indices
      * @param types
      * @param queryParams
+     * @param aggregationParams
      * @return
      * @Descrption 基础查询
      * @author shuting.wu
      * @date 2017/3/20 11:31
      **/
-    private String query(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams) {
+
+    private String query(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams) {
         long begin = new Date().getTime();
         //转换查询参数
 
@@ -81,7 +102,7 @@ public class SearchServiceImpl implements ISearchService {
         QueryBuilder queryBuilder = null;
         FilterBuilder filterBuilder = null;
         if (null != queryParams && queryParams.length > 0) {
-            builders = parseToQuery(queryParams);
+            builders = parseQuery(queryParams);
             queryBuilder = (QueryBuilder) builders.get("query");
             filterBuilder = (FilterBuilder) builders.get("filter");
         }
@@ -119,7 +140,7 @@ public class SearchServiceImpl implements ISearchService {
      * @author shuting.wu
      * @date 2017/3/24 16:22
     **/
-    private Map<String, Object> parseToQuery(QueryParam[] queryParams) {
+    private Map<String, Object> parseQuery(QueryParam[] queryParams) {
         BoolQueryBuilder boolQueryBuilder = null;
         BoolFilterBuilder boolFilterBuilder = null;
         QueryBuilder queryBuilder = null;
@@ -216,6 +237,25 @@ public class SearchServiceImpl implements ISearchService {
         builders.put("query",boolQueryBuilder);
         builders.put("filter",boolFilterBuilder);
         return builders;
+    }
+
+    private void parseAggregation(AggregationParam[] aggParams,AggregationBuilder parentAggBuilder) {
+        AggregationBuilder aggbuilder = null;
+        for(AggregationParam aggParam:aggParams) {
+            switch (aggParam.getType()) {
+                case TERM:
+                    aggbuilder = AggregationBuilders.terms(aggParam.getAggName()).field(aggParam.getField());
+                    break;
+                case NESTED:
+                    aggbuilder = AggregationBuilders.nested(aggParam.getAggName()).path(aggParam.getField());
+                    break;
+                default:
+                    break;
+            }
+            if(aggParam.getNestedAggs() != null && aggParam.getNestedAggs().size() > 0) {
+                aggbuilder = parseAggregation(aggParam.getNestedAggs(),parentAggBuilder);
+            }
+        }
     }
 
     /**

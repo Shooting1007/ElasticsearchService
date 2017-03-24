@@ -1,5 +1,6 @@
 package wst.prj.es.service;
 
+import wst.prj.es.pojo.AggregationParam;
 import wst.prj.es.pojo.Pagination;
 import wst.prj.es.pojo.QueryParam;
 
@@ -37,17 +38,20 @@ public interface ISearchService {
     public String commonQuery(String[] indices, String[] types, Pagination pagination,String[] returnFields,String objectName, QueryParam[] queryParams);
 
     /**
-     * @Descrption 简单查询
+     * @Descrption
      * @param indices
      * @param types
-     * @param queryParams
-     * @param orderFields
      * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @param aggregationParams
      * @return
      * @author shuting.wu
-     * @date 2017/3/20 11:24
+     * @date 2017/3/24 17:41
     **/
-    //public String commonQuery(String[] indices, String[] types, QueryParam[] queryParams,String[] orderFields, Pagination pagination);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams);
+
 
     /*public String aggregate();
 

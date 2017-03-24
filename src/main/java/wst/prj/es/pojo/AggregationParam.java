@@ -3,6 +3,9 @@ package wst.prj.es.pojo;/**
  */
 
 import lombok.Data;
+import wst.prj.es.common.AggregationType;
+
+import java.util.ArrayList;
 
 /**
  * @author shuting.wu
@@ -13,6 +16,7 @@ public class AggregationParam {
     private boolean isGlobal; //是否包含查询条件
     private String aggName; //名称
     private String field; //统计字段
-    private QueryParam queryParam;//过滤条件
-
+    private AggregationType type; //聚合类型
+    private boolean isReverse = false; //nested字段查询要聚合上级字段，需设置为true
+    private ArrayList<AggregationParam> nestedAggs = null; //嵌套聚合
 }
