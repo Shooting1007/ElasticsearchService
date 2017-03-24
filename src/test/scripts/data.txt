@@ -1,0 +1,6 @@
+{ "index": {"_index": "my_index", "_type": "my_type", "_id": "3"}}
+{"title":"新浪头条","content":"霍建华竟然结婚了！！！","messageList":[{"usrKey":"10","message":"大吃一惊 伤心欲绝","msgTime":"2016-6-6 10:10:10"}],"category":"/社会/娱乐/明星"}
+{ "index": {"_index": "my_index", "_type": "my_type", "_id": "4"}}
+{"title":"凤凰新闻","content":"霍建华的娃都打酱油了！！！！","messageList":[{"usrKey":"10","message":"祝福","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"喜欢","msgTime":"2016-12-16 20:10:10"}],"category":"/社会/娱乐/明星"}
+{ "index": {"_index": "my_index", "_type": "my_type", "_id": "5"}}
+{"title":"新闻联播","content":"国事家事天下事，事事烦心！！！","messageList":[{"usrKey":"12","message":"想太多","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"庸人自扰之","msgTime":"2016-12-19 20:10:11"}],"category":"/国家/军事"}

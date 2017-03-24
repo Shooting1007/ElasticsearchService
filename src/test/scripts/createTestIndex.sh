@@ -1,0 +1,196 @@
+#!/bin/sh
+#删除索引
+curl -XDELETE http://localhost:9200/my_index
+#创建索引
+curl -XPUT http://localhost:9200/my_index -d '
+{
+    "state":"open",
+    "settings":{
+        "index":{
+            "number_of_replicas":"1",
+            "analysis":{
+                "analyzer":{
+                    "path_analyzer":{
+                        "tokenizer":"path_hierarchy"
+                    },
+                    "en":{
+                        "filter":[
+                            "asciifolding",
+                            "lowercase",
+                            "ourEnglishFilter"
+                        ],
+                        "tokenizer":"standard"
+                    },
+                    "pinyin_analyzer":{
+                        "filter":[
+                            "standard",
+                            "nGram"
+                        ],
+                        "tokenizer":"my_pinyin"
+                    }
+                },
+                "filter":{
+                    "ourEnglishFilter":{
+                        "type":"kstem"
+                    }
+                },
+                "tokenizer":{
+                    "my_pinyin":{
+                        "padding_char":"",
+                        "type":"pinyin",
+                        "first_letter":"prefix"
+                    }
+                }
+            },
+            "number_of_shards":"2",
+            "refresh_interval":"5s",
+            "version":{
+                "created":"1070399"
+            }
+        }
+    },
+    "mappings":{
+        "_default_" : {
+             "dynamic" : "strict"
+         },
+        "my_type":{
+            "properties":{
+                "title":{
+                    "type":"string"
+                },
+                "content":{
+                    "type":"string"
+                },
+                "messageList":{
+                    "type":"nested",
+                    "properties":{
+                        "usrKey":{
+                            "type":"long",
+                            "index":"not_analyzed"
+                        },
+                        "message":{
+                            "type":"string",
+                            "analyzer":"ik_and_word"
+                        },
+                        "msgTime":{
+                            "type":"date",
+                            "format":"yyyy-MM-dd HH:mm:ss",
+                            "store":"yes"
+                        }
+                    }
+                },
+                "category":{
+                    "type":"multi_field",
+                    "fields":{
+                        "path":{
+                            "type":"string",
+                            "store":"no",
+                            "analyzer":"path_analyzer"
+                        },
+                        "primitive":{
+                            "type":"string",
+                            "analyzer":"ik_and_word"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+'
+#查看文档类型 mapper
+curl -XGET http://localhost:9200/my_index/_mapping?pretty
+#修改mapper
+curl -XPOST "http://localhost:9200/my_index/my_type/_mapping?pretty" -d '
+{
+    "my_type":{
+        "properties":{
+            "content":{
+                "type":"string"
+            }
+        }
+    }
+}
+'
+curl -XPOST "http://localhost:9200/my_index/my_type/_mapping?pretty" -d '
+{
+    "my_type":{
+        "properties":{
+            "messageList":{
+                "type":"nested",
+                "properties":{
+                    "usrKey":{
+                        "type":"long",
+                        "index":"not_analyzed"
+                    },
+                    "message":{
+                        "type":"string",
+                        "analyzer":"ik_and_word"
+                    },
+                    "msgTime":{
+                        "type":"date",
+                        "format":"yyyy-MM-dd HH:mm:ss",
+                        "store":"yes"
+                    }
+                }
+            },
+            "category":{
+                "type":"multi_field",
+                "fields":{
+                    "path":{
+                        "type":"string",
+                        "store":"no",
+                        "analyzer":"path_analyzer",
+                        "boost":10
+                    },
+                    "primitive":{
+                        "type":"string",
+                        "analyzer":"ik_and_word"
+                    }
+                }
+            }
+        }
+    }
+}
+'
+#修改索引settings
+curl -XPUT http://localhost:9200/my_index -d '
+{
+    "setting": {
+        "analysis":{
+                "analyzer":{
+                    "path_analyzer":{
+                        "tokenizer":"path_hierarchy"
+                    },
+                    "en":{
+                        "filter":[
+                            "asciifolding",
+                            "lowercase",
+                            "ourEnglishFilter"
+                        ],
+                        "tokenizer":"standard"
+                    },
+                    "pinyin_analyzer":{
+                        "filter":[
+                            "standard",
+                            "nGram"
+                        ],
+                        "tokenizer":"my_pinyin"
+                    }
+                },
+                "filter":{
+                    "ourEnglishFilter":{
+                        "type":"kstem"
+                    }
+                },
+                "tokenizer":{
+                    "my_pinyin":{
+                        "padding_char":"",
+                        "type":"pinyin",
+                        "first_letter":"prefix"
+                    }
+                }
+            }
+    }
+}
+'
