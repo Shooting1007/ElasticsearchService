@@ -4,23 +4,29 @@ package wst.prj.es.service.impl;
  */
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import org.apache.commons.collections.map.HashedMap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.*;
+import org.elasticsearch.search.aggregations.bucket.global.Global;
+import org.elasticsearch.search.aggregations.bucket.global.InternalGlobal;
+import org.elasticsearch.search.aggregations.bucket.nested.InternalNested;
+import org.elasticsearch.search.aggregations.bucket.nested.Nested;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.MetricsAggregationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wst.prj.es.common.SearchOperator;
 import wst.prj.es.common.SearchType;
-import wst.prj.es.pojo.AggregationParam;
-import wst.prj.es.pojo.ElasticClient;
-import wst.prj.es.pojo.Pagination;
-import wst.prj.es.pojo.QueryParam;
+import wst.prj.es.pojo.*;
 import wst.prj.es.service.ISearchService;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -44,7 +50,7 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName) {
-        return query(indices, types, pagination, returnFields, objectName, null,null);
+        return query(indices, types, pagination, returnFields, objectName, null, null);
     }
 
 
@@ -62,7 +68,7 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams,null);
+        return query(indices, types, pagination, returnFields, objectName, queryParams, null);
     }
 
     /**
@@ -80,7 +86,7 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams,aggregationParams);
+        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams);
     }
 
     /**
@@ -102,7 +108,7 @@ public class SearchServiceImpl implements ISearchService {
         QueryBuilder queryBuilder = null;
         FilterBuilder filterBuilder = null;
         if (null != queryParams && queryParams.length > 0) {
-            builders = parseQuery(queryParams);
+            builders = this.parseQuery(queryParams);
             queryBuilder = (QueryBuilder) builders.get("query");
             filterBuilder = (FilterBuilder) builders.get("filter");
         }
@@ -114,32 +120,36 @@ public class SearchServiceImpl implements ISearchService {
         srb.setSize(pagination.getPageSize());
         srb.setFrom(pagination.getPageSize() * (pagination.getPageNo() - 1));
         //设置查询条件
-        if(queryBuilder != null) {
+        if (queryBuilder != null) {
             srb.setQuery(queryBuilder);
         }
-        if(filterBuilder != null) {
+        if (filterBuilder != null) {
             srb.setPostFilter(filterBuilder);
         }
-
+        //设置聚合参数
+        if (aggregationParams != null && aggregationParams.length > 0) {
+            for (AggregationParam aggParam : aggregationParams) {
+                srb.addAggregation(this.parseAggregation(aggParam));
+            }
+        }
         SearchResponse scrollResp = srb.execute().actionGet();
         long totalCount = scrollResp.getHits().getTotalHits();
-        long took = scrollResp.getTookInMillis();
         //页数判断，当总条数除以每页条数，有余数的话，总页数加1。
         Integer totalPage = (int) Math.ceil((double) totalCount / (double) pagination.getPageSize());
         pagination.setPageCount(scrollResp.getHits().getHits().length);
         pagination.setTotalCount(totalCount);
         pagination.setTotalPage(totalPage);
 
-        return this.jsonResultByFields(scrollResp.getHits().getHits(), objectName, pagination, took, begin);
+        return this.jsonResultByFields(scrollResp, objectName, pagination, begin);
     }
 
     /**
-     * @Descrption 参数转换为查询对象
      * @param queryParams
      * @return Map包含两个对象： query，filter
+     * @Descrption 参数转换为查询对象
      * @author shuting.wu
      * @date 2017/3/24 16:22
-    **/
+     **/
     private Map<String, Object> parseQuery(QueryParam[] queryParams) {
         BoolQueryBuilder boolQueryBuilder = null;
         BoolFilterBuilder boolFilterBuilder = null;
@@ -171,7 +181,7 @@ public class SearchServiceImpl implements ISearchService {
                             .analyzer(queryParam.getAnalyzer());
                     break;
                 case TERM:
-                    filterBuilder = FilterBuilders.termFilter(field,value);
+                    filterBuilder = FilterBuilders.termFilter(field, value);
                     //queryBuilder = QueryBuilders.termQuery(field, value);
                     break;
                 case RANGE:
@@ -188,10 +198,10 @@ public class SearchServiceImpl implements ISearchService {
                 if (field.indexOf(".") == -1) {
                     continue;
                 }
-                if(queryBuilder != null) {
+                if (queryBuilder != null) {
                     queryBuilder = QueryBuilders.nestedQuery(field.substring(0, field.lastIndexOf(".")), queryBuilder);
                 }
-                if(filterBuilder != null) {
+                if (filterBuilder != null) {
                     filterBuilder = FilterBuilders.nestedFilter(field.substring(0, field.lastIndexOf(".")), filterBuilder);
                 }
             }
@@ -234,28 +244,70 @@ public class SearchServiceImpl implements ISearchService {
 
         }
         Map<String, Object> builders = new HashMap<String, Object>();
-        builders.put("query",boolQueryBuilder);
-        builders.put("filter",boolFilterBuilder);
+        builders.put("query", boolQueryBuilder);
+        builders.put("filter", boolFilterBuilder);
         return builders;
     }
 
-    private void parseAggregation(AggregationParam[] aggParams,AggregationBuilder parentAggBuilder) {
-        AggregationBuilder aggbuilder = null;
-        for(AggregationParam aggParam:aggParams) {
-            switch (aggParam.getType()) {
-                case TERM:
-                    aggbuilder = AggregationBuilders.terms(aggParam.getAggName()).field(aggParam.getField());
-                    break;
-                case NESTED:
-                    aggbuilder = AggregationBuilders.nested(aggParam.getAggName()).path(aggParam.getField());
-                    break;
-                default:
-                    break;
-            }
-            if(aggParam.getNestedAggs() != null && aggParam.getNestedAggs().size() > 0) {
-                aggbuilder = parseAggregation(aggParam.getNestedAggs(),parentAggBuilder);
+    /**
+     * @param aggParam
+     * @return
+     * @Descrption 参数转换为聚合对象
+     * @author shuting.wu
+     * @date 2017/3/26 16:34
+     **/
+    private AbstractAggregationBuilder parseAggregation(AggregationParam aggParam) {
+        AggregationBuilder aggBuilder = null;
+        MetricsAggregationBuilder metricsBuilder = null;
+        switch (aggParam.getType()) {
+            case GLOBAL:
+                aggBuilder = AggregationBuilders.global(aggParam.getAggName());
+                break;
+            case TERM:
+                aggBuilder = AggregationBuilders.terms(aggParam.getAggName()).field(aggParam.getField())
+                        .size(aggParam.getSize());
+                break;
+            case NESTED:
+                if (aggParam.isReverse()) {
+                    aggBuilder = AggregationBuilders.reverseNested(aggParam.getAggName()).path(aggParam.getField());
+                } else {
+                    aggBuilder = AggregationBuilders.nested(aggParam.getAggName()).path(aggParam.getField());
+                }
+                break;
+            case IS_NULL:
+                aggBuilder = AggregationBuilders.missing(aggParam.getAggName());
+                break;
+            case DATE_HISTOGRAM:
+                aggBuilder = AggregationBuilders.dateHistogram(aggParam.getAggName()).field(aggParam.getField());
+                break;
+            case METRICS_MAX:
+                metricsBuilder = AggregationBuilders.max(aggParam.getAggName()).field(aggParam.getField());
+                break;
+            case METRICS_MIN:
+                metricsBuilder = AggregationBuilders.min(aggParam.getAggName()).field(aggParam.getField());
+                break;
+            case METRICS_SUM:
+                metricsBuilder = AggregationBuilders.sum(aggParam.getAggName()).field(aggParam.getField());
+                break;
+            case METRICS_AVG:
+                metricsBuilder = AggregationBuilders.avg(aggParam.getAggName()).field(aggParam.getField());
+                break;
+            case METRICS_STATS:
+                metricsBuilder = AggregationBuilders.stats(aggParam.getAggName()).field(aggParam.getField());
+                break;
+            default:
+                break;
+        }
+        if (metricsBuilder != null) {
+            return metricsBuilder;
+        }
+        // TODO: 2017/3/26 下级聚合
+        if (aggParam.getNestedAggs() != null && aggParam.getNestedAggs().length > 0) {
+            for (AggregationParam subAggParam : aggParam.getNestedAggs()) {
+                aggBuilder = aggBuilder.subAggregation(parseAggregation(subAggParam));
             }
         }
+        return aggBuilder;
     }
 
     /**
@@ -278,8 +330,31 @@ public class SearchServiceImpl implements ISearchService {
         return result.toString();
     }
 
-    private String jsonResultByFields(SearchHit[] searchHits, String objectName, Pagination pagination, long took, long begin) {
+    /**
+     * @param scrollResp
+     * @param objectName
+     * @param pagination
+     * @param begin
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/3/27 13:45
+     **/
+    private String jsonResultByFields(SearchResponse scrollResp, String objectName, Pagination pagination, long begin) {
         StringBuffer result = new StringBuffer("{");
+        // TODO: 2017/3/27 时间花销封装
+        long took = scrollResp.getTookInMillis();
+        result.append("\"took\":" + took + ",\"tooks\":" + (new Date().getTime() - begin));
+        // TODO: 2017/3/27 封装分页信息
+        String paginationStr = ",\"pagination\":{\"pageNo\":\"" + pagination.getPageNo() + "\","
+                + "\"pageSize\":\"" + pagination.getPageSize() + "\","
+                + "\"pageCount\":\"" + pagination.getPageCount() + "\","
+                + "\"totalCount\":\"" + pagination.getTotalCount() + "\","
+                + "\"totalPage\":\"" + pagination.getTotalPage() + "\""
+                + "}";
+        result.append(paginationStr);
+        // TODO: 2017/3/27 封装查询结果
+        SearchHit[] searchHits = scrollResp.getHits().getHits();
         Iterator<Map.Entry<String, SearchHitField>> fieldIterable = null;
         List<Object> resultList = new ArrayList<Object>();
         Map.Entry<String, SearchHitField> fieldEntry = null;
@@ -288,31 +363,75 @@ public class SearchServiceImpl implements ISearchService {
         for (SearchHit searchHit : searchHits) {
             entryMap = null;
             fieldIterable = searchHit.getFields().entrySet().iterator();
+            System.out.print("searchHit.score:" + searchHit.getScore() + "\n");
             while (fieldIterable.hasNext()) {
                 fieldEntry = fieldIterable.next();
                 searchHitField = fieldEntry.getValue();
-                //entryMap = (Map<String, Object>) this.entryToMapObject(searchHitField.getName(), searchHitField.getValues(), entryMap, 0);
                 entryMap = this.entryToMap(searchHitField.getName(), searchHitField.getValues(), entryMap, false);
             }
             resultList.add(entryMap);
         }
-        String paginationStr = "\"pagination\":{\"pageNo\":\"" + pagination.getPageNo() + "\","
-                + "\"pageSize\":\"" + pagination.getPageSize() + "\","
-                + "\"pageCount\":\"" + pagination.getPageCount() + "\","
-                + "\"totalCount\":\"" + pagination.getTotalCount() + "\","
-                + "\"totalPage\":\"" + pagination.getTotalPage() + "\""
-                + "}";
-        result.append(paginationStr);
-        result.append(",\"took\":" + took + ",\"tooks\":" + (new Date().getTime() - begin));
         if (null != resultList) {
             result.append(",\"" + objectName + "\":" + JSONArray.fromObject(resultList).toString() + "");
         } else {
             result.append(",\"" + objectName + "\":[{}]");
         }
+
+        // TODO: 2017/3/27 封装聚合结果
+        String aggsStr = null;
+        Aggregations aggs = scrollResp.getAggregations();
+        if (aggs != null && aggs.asList().size() > 0) {
+            Map<String, Object> aggsMap = this.aggsToMap(aggs, null);
+            result.append(",\"" + "aggs" + "\":" + JSONObject.fromObject(aggsMap).toString() + "");
+        }
         result.append("}");
         System.out.print("#######################################   搜索结果  #############################################" + "\n");
         System.out.print(result + "\n");
         return result.toString();
+    }
+
+    private Map<String, Object> aggsToMap(Aggregations aggs, Map<String, Object> aggMap) {
+        Iterator<Terms.Bucket> bucketIterator = null;
+        Map<String, Object> valueMap = null;
+        ArrayList<Map<String, Object>> valueList = null;
+
+        for (Aggregation agg : aggs) {
+            if(aggMap == null) {
+                aggMap = new HashedMap();
+            }
+            if (agg instanceof Terms) {
+                bucketIterator = ((Terms) agg).getBuckets().iterator();
+                while (bucketIterator.hasNext()) {
+                    Terms.Bucket bucket = bucketIterator.next();
+                    valueMap = new HashedMap();
+                    valueMap.put("key", bucket.getKey());
+                    valueMap.put("doc_count", bucket.getDocCount());
+                    if (bucket.getAggregations() != null && bucket.getAggregations().asList().size() > 0) {
+                        valueMap = aggsToMap(bucket.getAggregations(),valueMap);
+                    }
+                    if (valueList == null) {
+                        valueList = new ArrayList<>();
+                    }
+                    valueList.add(valueMap);
+                }
+                aggMap.put(agg.getName(),valueList);
+            } else {
+                try {
+                    Class<?> clazz = Class.forName(agg.getClass().getName());
+                    Method getDocCount = clazz.getMethod("getDocCount");
+                    Method getAggregations = clazz.getMethod("getAggregations");
+                    valueMap = new HashedMap();
+                    Object aggregations = getAggregations.invoke(agg);
+                    if(aggregations != null && ((Aggregations)aggregations).asList().size() > 0) {
+                        aggMap.put(agg.getName(),aggsToMap((Aggregations)aggregations, valueMap));
+                    }
+                    valueMap.put("doc_count",getDocCount.invoke(agg));
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage());
+                }
+            }
+        }
+        return aggMap;
     }
 
     /**

@@ -13,10 +13,10 @@ import java.util.ArrayList;
  **/
 @Data
 public class AggregationParam {
-    private boolean isGlobal; //是否包含查询条件
     private String aggName; //名称
     private String field; //统计字段
     private AggregationType type; //聚合类型
-    private boolean isReverse = false; //nested字段查询要聚合上级字段，需设置为true
-    private ArrayList<AggregationParam> nestedAggs = null; //嵌套聚合
+    private boolean isReverse = false; //nested子聚合，聚合字段为父级字段，需设置为true
+    private AggregationParam[]  nestedAggs = null; //嵌套聚合
+    private int size = 100; //限制长度,用于TERM聚合
 }
