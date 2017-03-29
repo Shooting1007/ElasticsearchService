@@ -19,6 +19,8 @@ import org.elasticsearch.search.aggregations.bucket.nested.Nested;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.MetricsAggregationBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wst.prj.es.common.SearchOperator;
@@ -50,9 +52,14 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName) {
-        return query(indices, types, pagination, returnFields, objectName, null, null);
+        return query(indices, types, pagination, returnFields, objectName, null, null,null);
     }
 
+
+    @Override
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, SortParam[] sortParams) {
+        return query(indices, types, pagination, returnFields, objectName, queryParams, null,sortParams);
+    }
 
     /**
      * @param indices
@@ -68,7 +75,7 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, null);
+        return query(indices, types, pagination, returnFields, objectName, queryParams, null,null);
     }
 
     /**
@@ -86,7 +93,43 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams);
+        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams,null);
+    }
+
+    /**
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param sortParams
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/3/29 13:58
+     **/
+    @Override
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, SortParam[] sortParams) {
+        return query(indices, types, pagination, returnFields, objectName, null, null,sortParams);
+    }
+
+    /**
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @param aggregationParams
+     * @param sortParams
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/3/29 14:57
+     **/
+    @Override
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams) {
+        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams,sortParams);
     }
 
     /**
@@ -100,10 +143,9 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/20 11:31
      **/
 
-    private String query(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams) {
+    private String query(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams) {
         long begin = new Date().getTime();
         //转换查询参数
-
         Map<String, Object> builders = null;
         QueryBuilder queryBuilder = null;
         FilterBuilder filterBuilder = null;
@@ -132,6 +174,15 @@ public class SearchServiceImpl implements ISearchService {
                 srb.addAggregation(this.parseAggregation(aggParam));
             }
         }
+        //设置高亮
+
+        //设置排序
+        if(sortParams != null && sortParams.length > 0) {
+            for(SortParam sortParam:sortParams) {
+                srb.addSort(sortParam.getField(),sortParam.getOrder());
+            }
+        }
+
         SearchResponse scrollResp = srb.execute().actionGet();
         long totalCount = scrollResp.getHits().getTotalHits();
         //页数判断，当总条数除以每页条数，有余数的话，总页数加1。

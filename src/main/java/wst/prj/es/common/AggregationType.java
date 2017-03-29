@@ -4,6 +4,12 @@ package wst.prj.es.common;
  * Created by shuting.wu on 2017/3/24.
  */
 public enum AggregationType {
+    GLOBAL {
+        @Override
+        public String toString() {
+            return super.toString();
+        }
+    },
     TERM {
         @Override
         public String toString() {
@@ -46,7 +52,13 @@ public enum AggregationType {
             return super.toString();
         }
     },
-    METRICS_MEAN {
+    METRICS_AVG {
+        @Override
+        public String toString() {
+            return super.toString();
+        }
+    },
+    METRICS_STATS {
         @Override
         public String toString() {
             return super.toString();

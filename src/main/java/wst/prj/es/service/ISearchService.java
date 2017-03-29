@@ -3,6 +3,7 @@ package wst.prj.es.service;
 import wst.prj.es.pojo.AggregationParam;
 import wst.prj.es.pojo.Pagination;
 import wst.prj.es.pojo.QueryParam;
+import wst.prj.es.pojo.SortParam;
 
 /**
  * Created by shuting.wu on 2017/3/13.
@@ -52,12 +53,55 @@ public interface ISearchService {
     **/
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams);
 
+    /**
+     * @Descrption
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @param sortParams
+     * @return
+     * @author shuting.wu
+     * @date 2017/3/29 13:58
+    **/
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, SortParam[] sortParams);
+
+    /**
+     * @Descrption
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param sortParams
+     * @return
+     * @author shuting.wu
+     * @date 2017/3/29 13:58
+    **/
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, SortParam[] sortParams);
+
+    /**
+     * @Descrption
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @param aggregationParams
+     * @param sortParams
+     * @return 
+     * @author shuting.wu
+     * @date 2017/3/29 14:57
+    **/
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName,QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams);
 
     /*public String aggregate();
 
     public String popularKeywords();
 
     public String similarKeywords();*/
-
 
 }
