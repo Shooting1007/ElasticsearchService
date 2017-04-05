@@ -10,7 +10,7 @@ import java.util.List;
  * @author shuting.wu
  * @date 2017-04-05 13:53
  **/
-public class JsonUtil {
+public class StringUtil {
     public static String arrayToString(List<Object> list) {
         StringBuffer result = null;
         for(Object o: list) {

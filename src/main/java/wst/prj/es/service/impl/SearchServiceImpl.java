@@ -9,7 +9,6 @@ import org.apache.commons.collections.map.HashedMap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.text.Text;
-import org.elasticsearch.index.mapper.FieldMapper;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
@@ -17,11 +16,9 @@ import org.elasticsearch.search.aggregations.*;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.MetricsAggregationBuilder;
 import org.elasticsearch.search.highlight.HighlightField;
-import org.elasticsearch.search.highlight.Highlighter;
-import org.elasticsearch.search.highlight.HighlighterContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wst.prj.es.common.JsonUtil;
+import wst.prj.es.common.StringUtil;
 import wst.prj.es.common.PropertiesUtil;
 import wst.prj.es.common.SearchOperator;
 import wst.prj.es.common.SearchType;
@@ -656,7 +653,7 @@ public class SearchServiceImpl implements ISearchService {
             entryMap.put(key, fieldMap);
         } else {
             //TODO 非数组
-            entryMap.put(key, JsonUtil.arrayToString((List) fieldValue));
+            entryMap.put(key, StringUtil.arrayToString((List) fieldValue));
         }
 
         return entryMap;
