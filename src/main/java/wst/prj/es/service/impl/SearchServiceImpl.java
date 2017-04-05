@@ -8,21 +8,21 @@ import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.mapper.FieldMapper;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.aggregations.*;
-import org.elasticsearch.search.aggregations.bucket.global.Global;
-import org.elasticsearch.search.aggregations.bucket.global.InternalGlobal;
-import org.elasticsearch.search.aggregations.bucket.nested.InternalNested;
-import org.elasticsearch.search.aggregations.bucket.nested.Nested;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.MetricsAggregationBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.search.highlight.HighlightField;
+import org.elasticsearch.search.highlight.Highlighter;
+import org.elasticsearch.search.highlight.HighlighterContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wst.prj.es.common.JsonUtil;
+import wst.prj.es.common.PropertiesUtil;
 import wst.prj.es.common.SearchOperator;
 import wst.prj.es.common.SearchType;
 import wst.prj.es.pojo.*;
@@ -52,13 +52,13 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName) {
-        return query(indices, types, pagination, returnFields, objectName, null, null,null);
+        return query(indices, types, pagination, returnFields, objectName, null, null,null,null);
     }
 
 
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, SortParam[] sortParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, null,sortParams);
+        return query(indices, types, pagination, returnFields, objectName, queryParams, null,sortParams,null);
     }
 
     /**
@@ -75,7 +75,7 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, null,null);
+        return query(indices, types, pagination, returnFields, objectName, queryParams, null,null,null);
     }
 
     /**
@@ -93,7 +93,7 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams,null);
+        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams,null,null);
     }
 
     /**
@@ -110,7 +110,7 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, SortParam[] sortParams) {
-        return query(indices, types, pagination, returnFields, objectName, null, null,sortParams);
+        return query(indices, types, pagination, returnFields, objectName, null, null,sortParams,null);
     }
 
     /**
@@ -129,7 +129,82 @@ public class SearchServiceImpl implements ISearchService {
      **/
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams,sortParams);
+        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams,sortParams,null);
+    }
+
+    /**
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @param aggregationParams
+     * @param sortParams
+     * @param highLightFields    @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/3/29 16:19
+     **/
+    @Override
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams, String[] highLightFields) {
+        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams, sortParams, highLightFields);
+    }
+
+    /**
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @param sortParams
+     * @param highLightFields
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/3/29 16:21
+     **/
+    @Override
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, SortParam[] sortParams, String[] highLightFields) {
+        return query(indices, types, pagination, returnFields, objectName, queryParams, null, sortParams, highLightFields);
+    }
+
+    /**
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @param aggregationParams
+     * @param highLightFields
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/3/29 16:20
+     **/
+    @Override
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, String[] highLightFields) {
+        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams, null, highLightFields);
+    }
+
+    /**
+     * @param indices
+     * @param types
+     * @param pagination
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @param highLightFields
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/3/29 16:20
+     **/
+    @Override
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, String[] highLightFields) {
+        return query(indices, types, pagination, returnFields, objectName, queryParams, null, null, highLightFields);
     }
 
     /**
@@ -143,73 +218,87 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/20 11:31
      **/
 
-    private String query(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams) {
-        long begin = new Date().getTime();
-        //转换查询参数
-        Map<String, Object> builders = null;
-        QueryBuilder queryBuilder = null;
-        FilterBuilder filterBuilder = null;
-        if (null != queryParams && queryParams.length > 0) {
-            builders = this.parseQuery(queryParams);
-            queryBuilder = (QueryBuilder) builders.get("query");
-            filterBuilder = (FilterBuilder) builders.get("filter");
-        }
+    private String query(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams,String[] hightLightFields) {
+        try {
+            long begin = new Date().getTime();
 
-        //查询
-        SearchRequestBuilder srb = new SearchRequestBuilder(ElasticClient.getTransportClient());
-        srb.setIndices(indices).setTypes(types).addFields(returnFields);
-        //设置分页
-        srb.setSize(pagination.getPageSize());
-        srb.setFrom(pagination.getPageSize() * (pagination.getPageNo() - 1));
-        //设置查询条件
-        if (queryBuilder != null) {
-            srb.setQuery(queryBuilder);
-        }
-        if (filterBuilder != null) {
-            srb.setPostFilter(filterBuilder);
-        }
-        //设置聚合参数
-        if (aggregationParams != null && aggregationParams.length > 0) {
-            for (AggregationParam aggParam : aggregationParams) {
-                srb.addAggregation(this.parseAggregation(aggParam));
+            // TODO: 2017/3/29  查询
+            SearchRequestBuilder srb = new SearchRequestBuilder(ElasticClient.getTransportClient());
+            srb.setIndices(indices).setTypes(types).addFields(returnFields);
+
+            // TODO: 2017/3/29 转换查询参数
+            Map<String, Object> builders = null;
+            QueryBuilder queryBuilder = null;
+            FilterBuilder filterBuilder = null;
+            if (null != queryParams && queryParams.length > 0) {
+                builders = this.parseQuery(queryParams);
+                queryBuilder = (QueryBuilder) builders.get("query");
+                filterBuilder = (FilterBuilder) builders.get("filter");
             }
-        }
-        //设置高亮
-
-        //设置排序
-        if(sortParams != null && sortParams.length > 0) {
-            for(SortParam sortParam:sortParams) {
-                srb.addSort(sortParam.getField(),sortParam.getOrder());
+            //TODO 2017/3/29  设置查询条件
+            if (queryBuilder != null) {
+                srb.setQuery(queryBuilder);
             }
+            if (filterBuilder != null) {
+                srb.setPostFilter(filterBuilder);
+            }
+            //TODO 2017/3/29  设置聚合参数
+            if (aggregationParams != null && aggregationParams.length > 0) {
+                for (AggregationParam aggParam : aggregationParams) {
+                    srb.addAggregation(this.parseAggregation(aggParam));
+                }
+            }
+            //TODO 2017/3/29  设置高亮
+            if(hightLightFields != null && hightLightFields.length > 0){
+                for(String field:hightLightFields){
+                    srb.addHighlightedField(field);
+                }
+                //srb.addHighlightedField("_source");
+                //srb.addHighlightedField("_all");
+                srb.setHighlighterPreTags(PropertiesUtil.getStringByKey("highlighterPreTags"));
+                srb.setHighlighterPostTags(PropertiesUtil.getStringByKey("highlighterPostTags"));
+            }
+            //TODO 2017/3/29  设置排序
+            if(sortParams != null && sortParams.length > 0) {
+                for(SortParam sortParam:sortParams) {
+                    srb.addSort(sortParam.getField(),sortParam.getOrder());
+                }
+            }
+            //TODO 2017/3/29  设置分页
+            srb.setSize(pagination.getPageSize());
+            srb.setFrom(pagination.getPageSize() * (pagination.getPageNo() - 1));
+
+            SearchResponse scrollResp = srb.execute().actionGet();
+
+            //TODO 2017/3/29  处理分页信息
+            long totalCount = scrollResp.getHits().getTotalHits();
+            Integer totalPage = (int) Math.ceil((double) totalCount / (double) pagination.getPageSize());
+            pagination.setPageCount(scrollResp.getHits().getHits().length);
+            pagination.setTotalCount(totalCount);
+            pagination.setTotalPage(totalPage);
+            return this.jsonResultByFields(scrollResp, objectName, pagination, begin);
+        }catch(Exception e){
+            LOGGER.error(e.getMessage(),e);
+            return "ERROR";
         }
-
-        SearchResponse scrollResp = srb.execute().actionGet();
-        long totalCount = scrollResp.getHits().getTotalHits();
-        //页数判断，当总条数除以每页条数，有余数的话，总页数加1。
-        Integer totalPage = (int) Math.ceil((double) totalCount / (double) pagination.getPageSize());
-        pagination.setPageCount(scrollResp.getHits().getHits().length);
-        pagination.setTotalCount(totalCount);
-        pagination.setTotalPage(totalPage);
-
-        return this.jsonResultByFields(scrollResp, objectName, pagination, begin);
     }
 
     /**
      * @param queryParams
      * @return Map包含两个对象： query，filter
-     * @Descrption 参数转换为查询对象
+     * @Descrption  参数转换为查询对象
      * @author shuting.wu
      * @date 2017/3/24 16:22
      **/
     private Map<String, Object> parseQuery(QueryParam[] queryParams) {
         BoolQueryBuilder boolQueryBuilder = null;
         BoolFilterBuilder boolFilterBuilder = null;
-        QueryBuilder queryBuilder = null;
-        FilterBuilder filterBuilder = null;
-        SearchOperator searchOperate = null;
-        SearchType searchType = null;
-        Object value = null;
-        String field = null;
+        QueryBuilder queryBuilder;
+        FilterBuilder filterBuilder;
+        SearchOperator searchOperate;
+        SearchType searchType;
+        Object value;
+        String field;
         for (QueryParam queryParam : queryParams) {
             filterBuilder = null;
             queryBuilder = null;
@@ -219,17 +308,20 @@ public class SearchServiceImpl implements ISearchService {
             switch (searchType) {
                 case MATCH:
                     queryBuilder = QueryBuilders.matchQuery(field, value)
-                            .analyzer(queryParam.getAnalyzer());
+                            .analyzer(queryParam.getAnalyzer())
+                            .boost(queryParam.getBoost());
                     break;
                 case PHASE:
                     queryBuilder = QueryBuilders.matchQuery(field, value)
                             .type(MatchQueryBuilder.Type.PHRASE)
-                            .analyzer(queryParam.getAnalyzer());
+                            .analyzer(queryParam.getAnalyzer())
+                            .boost(queryParam.getBoost());
                     break;
                 case PREFIX:
                     queryBuilder = QueryBuilders.matchQuery(field, value)
                             .type(MatchQueryBuilder.Type.PHRASE_PREFIX)
-                            .analyzer(queryParam.getAnalyzer());
+                            .analyzer(queryParam.getAnalyzer())
+                            .boost(queryParam.getBoost());
                     break;
                 case TERM:
                     filterBuilder = FilterBuilders.termFilter(field, value);
@@ -414,13 +506,32 @@ public class SearchServiceImpl implements ISearchService {
         for (SearchHit searchHit : searchHits) {
             entryMap = null;
             fieldIterable = searchHit.getFields().entrySet().iterator();
-            System.out.print("searchHit.score:" + searchHit.getScore() + "\n");
+            System.out.print("-------------------  searchHit.score:" + searchHit.getScore() + " ------------------ \n");
             while (fieldIterable.hasNext()) {
                 fieldEntry = fieldIterable.next();
                 searchHitField = fieldEntry.getValue();
                 entryMap = this.entryToMap(searchHitField.getName(), searchHitField.getValues(), entryMap, false);
             }
+            // TODO: 2017/3/29 高亮字段结果处理
+            if(!searchHit.getHighlightFields().isEmpty()) {
+                Iterator<HighlightField> iterable = searchHit.getHighlightFields().values().iterator();
+                HighlightField hField;
+                String highLightValue;
+                while (iterable.hasNext()) {
+                    hField = iterable.next();
+                    highLightValue = "";
+                    //System.out.print("highlightfield=" + hField.getName() + "\n");
+                    if(hField.getFragments() != null && hField.getFragments().length > 0) {
+                        for(Text text:hField.getFragments()){
+                            highLightValue += text.string();
+                        }
+                    }
+                    entryMap.put(hField.getName(),highLightValue);
+
+                }
+            }
             resultList.add(entryMap);
+
         }
         if (null != resultList) {
             result.append(",\"" + objectName + "\":" + JSONArray.fromObject(resultList).toString() + "");
@@ -436,6 +547,7 @@ public class SearchServiceImpl implements ISearchService {
             result.append(",\"" + "aggs" + "\":" + JSONObject.fromObject(aggsMap).toString() + "");
         }
         result.append("}");
+
         System.out.print("#######################################   搜索结果  #############################################" + "\n");
         System.out.print(result + "\n");
         return result.toString();
@@ -544,7 +656,7 @@ public class SearchServiceImpl implements ISearchService {
             entryMap.put(key, fieldMap);
         } else {
             //TODO 非数组
-            entryMap.put(key, ((List) fieldValue).get(0));
+            entryMap.put(key, JsonUtil.arrayToString((List) fieldValue));
         }
 
         return entryMap;

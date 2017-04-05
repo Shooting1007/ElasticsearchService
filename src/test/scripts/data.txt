@@ -3,4 +3,15 @@
 { "index": {"_index": "my_index", "_type": "my_type", "_id": "4"}}
 {"title":"凤凰新闻","content":"霍建华的娃都打酱油了！！！！","messageList":[{"usrKey":"10","message":"祝福","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"喜欢","msgTime":"2016-12-16 20:10:10"}],"category":"/社会/娱乐/明星"}
 { "index": {"_index": "my_index", "_type": "my_type", "_id": "5"}}
-{"title":"新闻联播","content":"国事家事天下事，事事烦心！！！","messageList":[{"usrKey":"12","message":"想太多","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"庸人自扰之","msgTime":"2016-12-19 20:10:11"}],"category":"/国家/军事"}
+{"title":"新闻联播","content":"国事家事天下事，事事烦心！！！","author":"帅哥","messageList":[{"usrKey":"12","message":"想太多","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"庸人自扰之","msgTime":"2016-12-19 20:10:11"}],"category":"/国家/军事"}
+{ "index": {"_index": "my_index", "_type": "my_type", "_id": "6"}}
+{"title":"新闻联播1","content":"国事家事天下事，事事烦心！！！","newsType":"新闻","seq":9,"author":"美女","messageList":[{"usrKey":"12","message":"想太多","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"庸人自扰之","msgTime":"2016-12-19 20:10:11"}],"category":"/国家/军事"}
+{ "index": {"_index": "my_index", "_type": "my_type", "_id": "7"}}
+{"title":"新闻联播2","content":"楼市调控！！！","newsType":"新闻","seq":9900,"author":"吴树婷","messageList":[{"usrKey":"12","message":"想太多","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"庸人自扰之","msgTime":"2016-12-19 20:10:11"}],"category":"/国家/军事"}
+{ "index": {"_index": "my_index", "_type": "my_type", "_id": "8"}}
+{"title":"财经1","content":"楼市调控！！！","newsType":"财经","seq":990,"author":"wust2","messageList":[{"usrKey":"12","message":"想太多","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"庸人自扰之","msgTime":"2016-12-19 20:10:11"}],"category":"/国家/军事"}
+{ "index": {"_index": "my_index", "_type": "my_type", "_id": "9"}}
+{"title":"娱乐1","content":"张靓颖是不是胖了？？？","newsType":"娱乐","seq":98,"author":"wust","messageList":[{"usrKey":"12","message":"想太多","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"庸人自扰之","msgTime":"2016-12-19 20:10:11"}],"category":"/国家/军事"}
+{ "index": {"_index": "my_index", "_type": "my_type", "_id": "10"}}
+{"title":"娱乐2","content":"赵雅芝女神","newsType":"娱乐","seq":99,"author":"wust","messageList":[{"usrKey":"12","message":"想太多","msgTime":"2016-12-6 10:10:10"},{"usrKey":"11","message":"庸人自扰之","msgTime":"2016-12-19 20:10:11"}],"category":"/国家/军事"}
+

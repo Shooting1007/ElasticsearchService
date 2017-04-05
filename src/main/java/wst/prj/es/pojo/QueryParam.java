@@ -31,6 +31,7 @@ public class QueryParam {
     private int expansions = 20; //限制匹配前缀扩展的词条数
     private boolean isNested = false; //是否数组
     private RangeParam range; //范围查询
+    private float boost = 1.0f; //提升字段重要性，影响相关性分数，但仅为影响因素之一
 
     @Data
     public class RangeParam {

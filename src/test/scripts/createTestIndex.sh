@@ -4,7 +4,6 @@ curl -XDELETE http://localhost:9200/my_index
 #创建索引
 curl -XPUT http://localhost:9200/my_index -d '
 {
-    "state":"open",
     "settings":{
         "index":{
             "number_of_replicas":"1",
@@ -44,9 +43,6 @@ curl -XPUT http://localhost:9200/my_index -d '
             },
             "number_of_shards":"2",
             "refresh_interval":"5s",
-            "version":{
-                "created":"1070399"
-            }
         }
     },
     "mappings":{
@@ -56,10 +52,12 @@ curl -XPUT http://localhost:9200/my_index -d '
         "my_type":{
             "properties":{
                 "title":{
-                    "type":"string"
+                    "type":"string",
+                    "store":"yes"
                 },
                 "content":{
-                    "type":"string"
+                    "type":"string",
+                    "store":"yes"
                 },
                 "messageList":{
                     "type":"nested",
@@ -89,7 +87,70 @@ curl -XPUT http://localhost:9200/my_index -d '
                         },
                         "primitive":{
                             "type":"string",
-                            "analyzer":"ik_and_word"
+                            "analyzer":"ik_and_word",
+                            "store":"yes"
+                        }
+                    }
+                },
+                "messageList":{
+                    "type":"nested",
+                    "properties":{
+                        "usrKey":{
+                            "type":"long",
+                            "index":"not_analyzed",
+                            "store":"yes"
+                        },
+                        "message":{
+                            "type":"string",
+                            "analyzer":"ik_and_word",
+                            "store":"yes"
+                        },
+                        "msgTime":{
+                            "type":"date",
+                            "format":"yyyy-MM-dd HH:mm:ss",
+                            "store":"yes"
+                        }
+                    }
+                },
+                "category":{
+                    "type":"multi_field",
+                    "fields":{
+                        "path":{
+                            "type":"string",
+                            "store":"no",
+                            "analyzer":"path_analyzer",
+                            "boost":10
+                        },
+                        "primitive":{
+                            "type":"string",
+                            "analyzer":"ik_and_word",
+                            "store":"yes"
+                        }
+                    }
+                },
+                "seq":{
+                    "type":"integer",
+                    "index":"not_analyzed"
+                },
+                "author":{
+                    "type":"string",
+                    "analyzer":"ik_max_word",
+                    "store":"yes"
+                },
+                "newsType":{
+                    "type":"multi_field",
+                    "fields":{
+                        "pingyin":{
+                            "type":"string",
+                            "store":"no",
+                            "term_vector":"with_positions_offsets",
+                            "analyzer":"pinyin_analyzer",
+                            "boost":10
+                        },
+                        "primitive":{
+                            "type":"string",
+                            "store":"yes",
+                            "analyzer":"ik_max_word"
                         }
                     }
                 }
@@ -121,11 +182,13 @@ curl -XPOST "http://localhost:9200/my_index/my_type/_mapping?pretty" -d '
                 "properties":{
                     "usrKey":{
                         "type":"long",
-                        "index":"not_analyzed"
+                        "index":"not_analyzed",
+                        "store":"yes"
                     },
                     "message":{
                         "type":"string",
-                        "analyzer":"ik_and_word"
+                        "analyzer":"ik_and_word",
+                        "store":"yes"
                     },
                     "msgTime":{
                         "type":"date",
@@ -145,7 +208,42 @@ curl -XPOST "http://localhost:9200/my_index/my_type/_mapping?pretty" -d '
                     },
                     "primitive":{
                         "type":"string",
-                        "analyzer":"ik_and_word"
+                        "analyzer":"ik_and_word",
+                        "store":"yes"
+                    }
+                }
+            }
+        }
+    }
+}
+'
+curl -XPOST "http://localhost:9200/my_index/my_type/_mapping?pretty" -d '
+{
+    "my_type":{
+        "properties":{
+            "seq":{
+                "type":"integer",
+                "index":"not_analyzed"
+            },
+            "author":{
+                "type":"string",
+                "analyzer":"ik_max_word",
+                "store":"yes"
+            },
+            "newsType":{
+                "type":"multi_field",
+                "fields":{
+                    "pingyin":{
+                        "type":"string",
+                        "store":"no",
+                        "term_vector":"with_positions_offsets",
+                        "analyzer":"pinyin_analyzer",
+                        "boost":10
+                    },
+                    "primitive":{
+                        "type":"string",
+                        "store":"yes",
+                        "analyzer":"ik_max_word"
                     }
                 }
             }
