@@ -8,7 +8,50 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
         "index":{
             "number_of_replicas":"0",
             "number_of_shards":"1",
-            "refresh_integererval":"5s"
+            "refresh_integererval":"5s",
+            "analysis":{
+                "analyzer":{
+                    "en":{
+                        "tokenizer":"standard",
+                        "filter":[
+                            "asciifolding",
+                            "lowercase",
+                            "ourEnglishFilter"
+                        ]
+                    },
+                    "path_analyzer":{
+                        "tokenizer":"path_hierarchy"
+                    },
+                    "pinyin_analyzer" : {
+                        "type": "custom",
+                        "tokenizer": "ik_smart",
+                        "filter": ["my_pinyin","word_delimiter"]
+                    }
+                },
+                "filter":{
+                    "ourEnglishFilter":{
+                        "type":"kstem"
+                    },
+                    "my_pinyin" :{
+                          "type": "pinyin",
+                          "first_letter" : "prefix",
+                          "padding_char" : " ",
+                          "keep_first_letter":false,
+                          "keep_separate_first_letter" : false,
+                          "keep_full_pinyin" : true,
+                          "keep_original" : false,
+                          "limit_first_letter_length" : 16,
+                          "lowercase" : true,
+                          "remove_duplicated_term" : true
+                    }
+                },
+                "tokenizer" : {
+                      "ik_smart": {
+                        "type": "ik",
+                        "use_smart": true
+                      }
+                }
+            }
         }
     },
     "mappings":{
@@ -41,15 +84,22 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                     "analyzed":"ik_max_word"
                 },
                 "fabricName":{
-                    "type":"string",
-                    "analyzed":"ik_max_word",
-                    "fields":{
-                        "pinyin":{
-                            "type":"string",
-                            "analyzed":"ik_pinyin"
+                    "type":"multi_field",
+                    "fields": {
+                        "pinyin": {
+                            "type": "string",
+                            "store": "no",
+                            "term_vector": "with_positions_offsets",
+                            "analyzer": "pinyin_analyzer",
+                            "boost": 10
+                        },
+                        "raw": {
+                            "type": "string",
+                            "store": "yes",
+                            "analyzer": "ik_max_word",
+                            "boost": 10
                         }
-                    },
-                    "boost":"10"
+                    }
                 },
                 "uploadTime":{
                     "type":"date",
@@ -137,14 +187,22 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                 "composn":{
                     "properties":{
                         "name":{
-                            "type":"string",
-                            "analyzed":"ik_max_word",
-                            "fields":{
-                                "pinyin":{
-                                    "type":"string",
-                                    "analyzed":"ik_pinyin"
+                            "type":"multi_field",
+                                "fields": {
+                                    "pinyin": {
+                                        "type": "string",
+                                        "store": "no",
+                                        "term_vector": "with_positions_offsets",
+                                        "analyzer": "pinyin_analyzer",
+                                        "boost": 5
+                                    },
+                                    "raw": {
+                                        "type": "string",
+                                        "store": "yes",
+                                        "analyzer": "ik_max_word",
+                                        "boost": 5
+                                    }
                                 }
-                            }
                         },
                         "path":{
                             "type":"string",
@@ -155,12 +213,20 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                 "fabricClass":{
                     "properties":{
                         "name":{
-                            "type":"string",
-                            "analyzed":"ik_max_word",
-                            "fields":{
-                                "pinyin":{
-                                    "type":"string",
-                                    "analyzed":"ik_pinyin"
+                            "type":"multi_field",
+                            "fields": {
+                                "pinyin": {
+                                    "type": "string",
+                                    "store": "no",
+                                    "term_vector": "with_positions_offsets",
+                                    "analyzer": "pinyin_analyzer",
+                                    "boost": 2
+                                },
+                                "raw": {
+                                    "type": "string",
+                                    "store": "yes",
+                                    "analyzer": "ik_max_word",
+                                    "boost": 2
                                 }
                             }
                         },
@@ -174,13 +240,7 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                     "properties":{
                         "name":{
                             "type":"string",
-                            "analyzed":"ik_max_word",
-                            "fields":{
-                                "pinyin":{
-                                    "type":"string",
-                                    "analyzed":"ik_pinyin"
-                                }
-                            }
+                            "analyzed":"ik_max_word"
                         },
                         "path":{
                             "type":"string",
@@ -191,10 +251,6 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                 "stepPrice":{
                     "type":"nested",
                     "properties":{
-                        "priceKey":{
-                            "type":"long",
-                            "index":"not_analyzed"
-                        },
                         "priceName":{
                             "type":"string",
                             "analyzer":"ik_max_word"

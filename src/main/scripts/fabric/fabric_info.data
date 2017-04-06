@@ -72,7 +72,6 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/1' -d '
     ],
     "stepPrice":[
         {
-            "priceKey":"1",
             "priceName":"小于100米",
             "priceValue":100
         }
@@ -140,17 +139,14 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/2' -d '
     ],
     "stepPrice":[
         {
-            "priceKey":"1",
             "priceName":"小于100米",
             "priceValue":100
         },
         {
-            "priceKey":"2",
             "priceName":"大于100米小于2000米",
             "priceValue":90
         },
         {
-            "priceKey":"3",
             "priceName":"大于2000米",
             "priceValue":80
         }
@@ -217,17 +213,14 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/3' -d '
     ],
     "stepPrice":[
         {
-            "priceKey":"1",
             "priceName":"小于100米",
             "priceValue":100
         },
         {
-            "priceKey":"2",
             "priceName":"大于100米小于2000米",
             "priceValue":90
         },
         {
-            "priceKey":"3",
             "priceName":"大于2000米",
             "priceValue":80
         }
@@ -302,17 +295,14 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/4' -d '
     ],
     "stepPrice":[
         {
-            "priceKey":"1",
             "priceName":"小于100米",
             "priceValue":1000
         },
         {
-            "priceKey":"2",
             "priceName":"大于100米小于2000米",
             "priceValue":900
         },
         {
-            "priceKey":"3",
             "priceName":"大于2000米",
             "priceValue":800
         }
