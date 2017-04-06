@@ -1,0 +1,33 @@
+{
+  "queryParam":[
+    {
+      "queryField":"minPrice",
+      "type":"RANGE",
+      "range":{
+        "upper":"500",
+        "lower":"100"
+      }
+    }
+  ],
+  "sortParam":[
+    {
+      "field":"minPrice",
+      "order":"ASC"
+    }
+  ],
+  "returnFields":"fabricCode,fabricName",
+  "aggParam":[
+    {
+      "aggName":"价格",
+      "field":"stepPrice",
+      "type":"NESTED",
+      "nestedAggs":[
+        {
+          "aggName":"",
+          "field":"stepPrice.priceValue",
+          "type":"METRICS_STATS"
+        }
+      ]
+    }
+  ]
+}

@@ -2,13 +2,11 @@ package wst.prj.es.common;/**
  * Created by shuting.wu on 2017/4/5.
  */
 
-import net.sf.json.JSONArray;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import wst.prj.es.pojo.QueryParam;
 
-import java.lang.reflect.Array;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author shuting.wu
@@ -37,7 +35,7 @@ public class StringUtil {
      * @author shuting.wu
      * @date 2017/4/6 14:48
     **/
-    public static <T> T jsonToList(String jsonStr, TypeReference<T> valueTypeRef) {
+    public static <T> T jsonStrToList(String jsonStr, TypeReference<T> valueTypeRef) {
         if (objectMapper == null) {
             objectMapper = new ObjectMapper();
         }
@@ -51,5 +49,18 @@ public class StringUtil {
         return null;
     }
 
+    public static Map jsonStrToMap(String jsonStr) throws Exception{
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
+        }
+
+        try {
+            return objectMapper.readValue(jsonStr, Map.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
 }

@@ -1,5 +1,6 @@
 {
-  "queryParam":[//查询参数 QueryParam[]
+  //查询参数 QueryParam[]
+  "queryParam":[
     {
       "queryField":"字段名",
       "boost":"权重，默认1.0f",
@@ -16,13 +17,16 @@
       }
     }
   ],
-  "sortParam":[//排序 SortParam[]
+  //排序 SortParam[]
+  "sortParam":[
     {
       "field":"排序字段",
       "order":"升序ASC，降序DESC"
     }
   ],
-  "returnFields":"field1,field2..." //返回字段
+  //返回字段 returnFields
+  "returnFields":"field1,field2...",
+  //聚合 AggregationParam[]
   "aggParam":[ //聚合 AggregationParam[]
     {
       "aggName":"名称",
@@ -38,9 +42,7 @@
           "reserve":false,
           "size":"100",
           "nestedAggs":[
-            [
 
-            ]
           ]
         }
       ]
