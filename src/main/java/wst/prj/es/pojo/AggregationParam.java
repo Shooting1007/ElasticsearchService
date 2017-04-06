@@ -2,7 +2,10 @@ package wst.prj.es.pojo;/**
  * Created by shuting.wu on 2017/3/24.
  */
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import wst.prj.es.common.AggregationType;
 
 import java.util.ArrayList;
@@ -11,7 +14,7 @@ import java.util.ArrayList;
  * @author shuting.wu
  * @date 2017-03-24 16:31
  **/
-@Data
+@Data @NoArgsConstructor @AllArgsConstructor @ToString
 public class AggregationParam {
     private String aggName; //名称
     private String field; //统计字段

@@ -184,7 +184,7 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                     "type":"string",
                     "analyzed":"ik_max_word"
                 },
-                "composn":{
+                "compsn":{
                     "properties":{
                         "name":{
                             "type":"multi_field",

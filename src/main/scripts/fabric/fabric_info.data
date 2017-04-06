@@ -21,7 +21,7 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/1' -d '
     "city":"厦门市",
     "area":"思明区",
     "weave":"梭织",
-    "composn":[
+    "compsn":[
         {
             "name":"棉",
             "path":"/混纺/棉"
@@ -101,7 +101,7 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/2' -d '
     "city":"厦门市",
     "area":"思明区",
     "weave":"针织",
-    "composn":[
+    "compsn":[
         {
             "name":"棉",
             "path":"/ALL/纯纺/棉"
@@ -176,7 +176,7 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/3' -d '
     "city":"北京市",
     "area":"朝阳区",
     "weave":"梭织",
-    "composn":[
+    "compsn":[
         {
             "name":"涤纶",
             "path":"/ALL/纯纺/涤纶"
@@ -250,7 +250,89 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/4' -d '
     "city":"北京市",
     "area":"朝阳区",
     "weave":"梭织",
-    "composn":[
+    "compsn":[
+        {
+            "name":"棉",
+            "path":"/ALL/混纺/棉"
+        },
+        {
+            "name":"羊毛",
+            "path":"/ALL/其他/羊毛"
+        },
+        {
+            "name":"涤纶",
+            "path":"/ALL/混纺/涤纶"
+        }
+    ],
+    "customerTag":[
+        "_all"
+    ],
+    "tech":[
+        "熨"
+    ],
+    "tag":[
+        "水洗"
+    ],
+    "sex":[
+        "男装",
+        "女装"
+    ],
+    "fabricClass":[
+        {
+            "name":"其他",
+            "path":"/ALL/其他"
+        }
+    ],
+    "sampleClass":[
+        {
+            "name":"衬衫",
+            "path":"/ALL/上装/衬衫"
+        },
+        {
+            "name":"裙子",
+            "path":"/ALL/下装/裙子"
+        }
+    ],
+    "stepPrice":[
+        {
+            "priceName":"小于100米",
+            "priceValue":1000
+        },
+        {
+            "priceName":"大于100米小于2000米",
+            "priceValue":900
+        },
+        {
+            "priceName":"大于2000米",
+            "priceValue":800
+        }
+    ]
+}
+'
+curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/5' -d '
+{
+    "fabricKey":"5",
+    "fabricCode":"F20170404T05",
+    "fabricName":"新宝蓝光滑质感面料",
+    "uploadTime":"2017-04-05 14:03:00",
+    "yarnCount":"180/枝",
+    "weight":"10g/m",
+    "width":"125",
+    "serial":"混纺系列",
+    "compsnDesc":"20%棉40%羊毛40%涤纶",
+    "minPrice":"350.00",
+    "thumb":"http://image04.jsp",
+    "sort":99,
+    "fineFlag":1,
+    "hasVfx":1,
+    "available":1,
+    "supplierKey":2,
+    "supplierName":"其他测试面料商",
+    "province":"北京",
+    "city":"北京市",
+    "area":"朝阳区",
+    "weave":"梭织",
+    "compsn":[
         {
             "name":"棉",
             "path":"/ALL/混纺/棉"

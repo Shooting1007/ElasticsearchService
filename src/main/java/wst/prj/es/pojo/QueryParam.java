@@ -2,7 +2,7 @@ package wst.prj.es.pojo;/**
  * Created by shuting.wu on 2017/3/14.
  */
 
-import lombok.Data;
+import lombok.*;
 import wst.prj.es.common.RangeOperator;
 import wst.prj.es.common.SearchOperator;
 import wst.prj.es.common.SearchType;
@@ -13,7 +13,7 @@ import java.util.Map;
  * @author shuting.wu
  * @date 2017-03-2017/3/14 10:51
  **/
-@Data
+@Data @NoArgsConstructor  @AllArgsConstructor @ToString
 public class QueryParam {
     /**
      * 不提供more like 相关查询，等价于 多个term的should查询合并成一个bool

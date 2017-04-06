@@ -1,0 +1,49 @@
+{
+  "queryParam":[//查询参数 QueryParam[]
+    {
+      "queryField":"字段名",
+      "boost":"权重，默认1.0f",
+      "value":"搜索值",
+      "operator":"操作关系：AND，NOT，OR...默认OR",
+      "analyzer":"分析器",
+      "type":"搜索方式：TERM，MATCH，PHASE，PREFIX，RANGE...",
+      "nested":false,  //true or false,default is false
+      "range":{
+        "upper":"最大值",
+        "lower":"最小值",
+        "includeLower":true,  //true or false,default is true
+        "includeUpper":true  //true or false,default is true
+      }
+    }
+  ],
+  "sortParam":[//排序 SortParam[]
+    {
+      "field":"排序字段",
+      "order":"升序ASC，降序DESC"
+    }
+  ],
+  "returnFields":"field1,field2..." //返回字段
+  "aggParam":[ //聚合 AggregationParam[]
+    {
+      "aggName":"名称",
+      "field":"字段",
+      "type":"类型:TERM,NESTED,METRICS_MIN,METRICS_MAX,METRICS_SUM,METRICS_AVG,METRICS_STATS...",
+      "reserve":false, //true or false,default is false
+      "size":"100", //default value is 100
+      "nestedAggs":[ //理论上可以无限嵌套
+        {
+          "aggName":"名称",
+          "field":"字段",
+          "type":"类型:TERM,NESTED,METRICS_MIN,METRICS_MAX,METRICS_SUM,METRICS_AVG,METRICS_STATS...",
+          "reserve":false,
+          "size":"100",
+          "nestedAggs":[
+            [
+
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}
