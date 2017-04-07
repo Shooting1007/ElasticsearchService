@@ -7,6 +7,22 @@
         "upper":"500",
         "lower":"100"
       }
+    },
+    {
+      "queryField":"fabricName.raw",
+      "type":"MATCH",
+      "value":"棉",
+      "boost":"10.0f"
+    },
+    {
+      "queryField":"compsn.name.raw",
+      "type":"MATCH",
+      "value":"棉"
+    },
+    {
+      "queryField":"fabricClass.name.raw",
+      "type":"MATCH",
+      "value":"棉"
     }
   ],
   "sortParam":[
@@ -29,5 +45,9 @@
         }
       ]
     }
-  ]
+  ],
+  "pagination":{
+    "pageSize":"1",
+    "pageNo":"1"
+  }
 }

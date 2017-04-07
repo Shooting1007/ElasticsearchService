@@ -35,6 +35,36 @@ import java.util.*;
 public class SearchServiceImpl implements ISearchService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchServiceImpl.class);
 
+    /**
+     * @param indices
+     * @param types
+     * @param returnFields
+     * @param objectName
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/4/7 15:31
+     **/
+    @Override
+    public String commonQuery(String[] indices, String[] types, String[] returnFields, String objectName) {
+        return query(indices,types,null,returnFields,"fabric",null,null,null,null);
+    }
+
+    /**
+     * @param indices
+     * @param types
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/4/7 15:39
+     **/
+    @Override
+    public String commonQuery(String[] indices, String[] types, String[] returnFields, String objectName, QueryParam[] queryParams) {
+        return query(indices,types,null,returnFields,"fabric",queryParams,null,null,null);
+    }
 
     /**
      * @param indices
@@ -262,6 +292,9 @@ public class SearchServiceImpl implements ISearchService {
                 }
             }
             //TODO 2017/3/29  设置分页
+            if(pagination == null) {
+                pagination = new Pagination();
+            }
             srb.setSize(pagination.getPageSize());
             srb.setFrom(pagination.getPageSize() * (pagination.getPageNo() - 1));
 

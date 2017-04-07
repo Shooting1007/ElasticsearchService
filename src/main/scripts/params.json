@@ -1,4 +1,12 @@
 {
+  //索引 string[]
+  "indics":"index1,index2...",
+  //类型 string[]
+  "types":"type1,type2...",
+  //返回字段 returnFields
+  "returnFields":"field1,field2...",
+  //高亮字段 highLightFields
+  "highLightFields":"field1,field2...",
   //查询参数 QueryParam[]
   "queryParam":[
     {
@@ -17,6 +25,11 @@
       }
     }
   ],
+  //分页 pagination
+  "pagination":{
+    "pageSize":"",
+    "pageNo":""
+  },
   //排序 SortParam[]
   "sortParam":[
     {
@@ -24,8 +37,6 @@
       "order":"升序ASC，降序DESC"
     }
   ],
-  //返回字段 returnFields
-  "returnFields":"field1,field2...",
   //聚合 AggregationParam[]
   "aggParam":[ //聚合 AggregationParam[]
     {

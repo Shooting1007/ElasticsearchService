@@ -14,6 +14,31 @@ public interface ISearchService {
      * @Descrption
      * @param indices
      * @param types
+     * @param returnFields
+     * @param objectName
+     * @return
+     * @author shuting.wu
+     * @date 2017/4/7 15:31
+    **/
+    public String commonQuery(String[] indices, String[] types, String[] returnFields,String objectName);
+
+    /**
+     * @Descrption
+     * @param indices
+     * @param types
+     * @param returnFields
+     * @param objectName
+     * @param queryParams
+     * @return
+     * @author shuting.wu
+     * @date 2017/4/7 15:39
+    **/
+    public String commonQuery(String[] indices, String[] types, String[] returnFields,String objectName, QueryParam[] queryParams);
+
+    /**
+     * @Descrption
+     * @param indices
+     * @param types
      * @param pagination
      * @param returnFields
      * @param objectName

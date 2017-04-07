@@ -4,12 +4,14 @@ package wst.prj.es.pojo;/**
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * @author shuting.wu
  * @date 2017-03-20 14:19
  **/
-@Data
+@Data @NoArgsConstructor @AllArgsConstructor @ToString
 public class Pagination {
     int pageNo = 1; //当前页面
     int pageSize = 50; //每页条数

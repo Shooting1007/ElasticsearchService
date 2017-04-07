@@ -30,7 +30,8 @@ public class StringUtil {
 
     /**
      * @Descrption jsonStr转对象
-     * @param params
+     * @param jsonStr
+     * @param valueTypeRef
      * @return
      * @author shuting.wu
      * @date 2017/4/6 14:48
@@ -49,13 +50,21 @@ public class StringUtil {
         return null;
     }
 
-    public static Map jsonStrToMap(String jsonStr) throws Exception{
+    /**
+     * @Descrption
+     * @param jsonStr
+     * @param clazz
+     * @return
+     * @author shuting.wu
+     * @date 2017/4/7 17:38
+    **/
+    public static <T> T jsonStrToBean(String jsonStr,Class<T> clazz) throws Exception{
         if (objectMapper == null) {
             objectMapper = new ObjectMapper();
         }
 
         try {
-            return objectMapper.readValue(jsonStr, Map.class);
+            return objectMapper.readValue(jsonStr, clazz);
         } catch (Exception e) {
             e.printStackTrace();
         }
