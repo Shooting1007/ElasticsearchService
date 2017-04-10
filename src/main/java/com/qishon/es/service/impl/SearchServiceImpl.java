@@ -1,8 +1,14 @@
-package wst.prj.es.service.impl;
+package com.qishon.es.service.impl;
 /**
  * Created by shuting.wu on 2017/3/13.
  */
 
+import com.qishon.es.common.PropertiesUtil;
+import com.qishon.es.common.SearchOperator;
+import com.qishon.es.common.SearchType;
+import com.qishon.es.common.StringUtil;
+import com.qishon.es.pojo.*;
+import com.qishon.es.service.ISearchService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
@@ -18,12 +24,6 @@ import org.elasticsearch.search.aggregations.metrics.MetricsAggregationBuilder;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wst.prj.es.common.StringUtil;
-import wst.prj.es.common.PropertiesUtil;
-import wst.prj.es.common.SearchOperator;
-import wst.prj.es.common.SearchType;
-import wst.prj.es.pojo.*;
-import wst.prj.es.service.ISearchService;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -39,22 +39,22 @@ public class SearchServiceImpl implements ISearchService {
      * @param indices
      * @param types
      * @param returnFields
-     * @param objectName
+     *
      * @return
      * @Descrption
      * @author shuting.wu
      * @date 2017/4/7 15:31
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, String[] returnFields, String objectName) {
-        return query(indices,types,null,returnFields,"fabric",null,null,null,null);
+    public String commonQuery(String[] indices, String[] types, String[] returnFields) {
+        return query(indices,types,null,returnFields,null,null,null,null);
     }
 
     /**
      * @param indices
      * @param types
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @return
      * @Descrption
@@ -62,8 +62,8 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/4/7 15:39
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, String[] returnFields, String objectName, QueryParam[] queryParams) {
-        return query(indices,types,null,returnFields,"fabric",queryParams,null,null,null);
+    public String commonQuery(String[] indices, String[] types, String[] returnFields,  QueryParam[] queryParams) {
+        return query(indices,types,null,returnFields,queryParams,null,null,null);
     }
 
     /**
@@ -71,21 +71,21 @@ public class SearchServiceImpl implements ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @return
      * @Descrption
      * @author shuting.wu
      * @date 2017/3/22 18:52
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName) {
-        return query(indices, types, pagination, returnFields, objectName, null, null,null,null);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields) {
+        return query(indices, types, pagination, returnFields,  null, null,null,null);
     }
 
 
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, SortParam[] sortParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, null,sortParams,null);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, SortParam[] sortParams) {
+        return query(indices, types, pagination, returnFields,  queryParams, null,sortParams,null);
     }
 
     /**
@@ -93,7 +93,7 @@ public class SearchServiceImpl implements ISearchService {
      * @param types
      * @param queryParams
      * @param pagination
-     * @param objectName
+     *
      * @param returnFields
      * @return
      * @Descrption
@@ -101,8 +101,8 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/20 15:28
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, null,null,null);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams) {
+        return query(indices, types, pagination, returnFields,  queryParams, null,null,null);
     }
 
     /**
@@ -110,7 +110,7 @@ public class SearchServiceImpl implements ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param aggregationParams
      * @return
@@ -119,8 +119,8 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/24 17:41
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams,null,null);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, AggregationParam[] aggregationParams) {
+        return query(indices, types, pagination, returnFields,  queryParams, aggregationParams,null,null);
     }
 
     /**
@@ -128,7 +128,7 @@ public class SearchServiceImpl implements ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param sortParams
      * @return
      * @Descrption
@@ -136,8 +136,8 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/29 13:58
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, SortParam[] sortParams) {
-        return query(indices, types, pagination, returnFields, objectName, null, null,sortParams,null);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  SortParam[] sortParams) {
+        return query(indices, types, pagination, returnFields,  null, null,sortParams,null);
     }
 
     /**
@@ -145,7 +145,6 @@ public class SearchServiceImpl implements ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
      * @param queryParams
      * @param aggregationParams
      * @param sortParams
@@ -155,8 +154,8 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/29 14:57
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams,sortParams,null);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams) {
+        return query(indices, types, pagination, returnFields,  queryParams, aggregationParams,sortParams,null);
     }
 
     /**
@@ -164,7 +163,6 @@ public class SearchServiceImpl implements ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
      * @param queryParams
      * @param aggregationParams
      * @param sortParams
@@ -174,8 +172,8 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/29 16:19
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams, String[] highLightFields) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams, sortParams, highLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams, String[] highLightFields) {
+        return query(indices, types, pagination, returnFields,  queryParams, aggregationParams, sortParams, highLightFields);
     }
 
     /**
@@ -183,7 +181,7 @@ public class SearchServiceImpl implements ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param sortParams
      * @param highLightFields
@@ -193,8 +191,8 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/29 16:21
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, SortParam[] sortParams, String[] highLightFields) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, null, sortParams, highLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, SortParam[] sortParams, String[] highLightFields) {
+        return query(indices, types, pagination, returnFields,  queryParams, null, sortParams, highLightFields);
     }
 
     /**
@@ -202,7 +200,7 @@ public class SearchServiceImpl implements ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param aggregationParams
      * @param highLightFields
@@ -212,8 +210,8 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/29 16:20
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, String[] highLightFields) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, aggregationParams, null, highLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, AggregationParam[] aggregationParams, String[] highLightFields) {
+        return query(indices, types, pagination, returnFields,  queryParams, aggregationParams, null, highLightFields);
     }
 
     /**
@@ -221,7 +219,6 @@ public class SearchServiceImpl implements ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
      * @param queryParams
      * @param highLightFields
      * @return
@@ -230,8 +227,8 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/29 16:20
      **/
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, String[] highLightFields) {
-        return query(indices, types, pagination, returnFields, objectName, queryParams, null, null, highLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, String[] highLightFields) {
+        return query(indices, types, pagination, returnFields,  queryParams, null, null, highLightFields);
     }
 
     /**
@@ -245,7 +242,7 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/20 11:31
      **/
 
-    private String query(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams,String[] hightLightFields) {
+    private String query(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams,String[] hightLightFields) {
         try {
             long begin = new Date().getTime();
 
@@ -306,7 +303,7 @@ public class SearchServiceImpl implements ISearchService {
             pagination.setPageCount(scrollResp.getHits().getHits().length);
             pagination.setTotalCount(totalCount);
             pagination.setTotalPage(totalPage);
-            return this.jsonResultByFields(scrollResp, objectName, pagination, begin);
+            return this.jsonResultByFields(scrollResp,  pagination, begin);
         }catch(Exception e){
             LOGGER.error(e.getMessage(),e);
             return "ERROR";
@@ -505,7 +502,7 @@ public class SearchServiceImpl implements ISearchService {
 
     /**
      * @param scrollResp
-     * @param objectName
+     *
      * @param pagination
      * @param begin
      * @return
@@ -513,7 +510,7 @@ public class SearchServiceImpl implements ISearchService {
      * @author shuting.wu
      * @date 2017/3/27 13:45
      **/
-    private String jsonResultByFields(SearchResponse scrollResp, String objectName, Pagination pagination, long begin) {
+    private String jsonResultByFields(SearchResponse scrollResp,  Pagination pagination, long begin) {
         StringBuffer result = new StringBuffer("{");
         // TODO: 2017/3/27 时间花销封装
         long took = scrollResp.getTookInMillis();
@@ -564,9 +561,9 @@ public class SearchServiceImpl implements ISearchService {
 
         }
         if (null != resultList) {
-            result.append(",\"" + objectName + "\":" + JSONArray.fromObject(resultList).toString() + "");
+            result.append(",\"hits\":" + JSONArray.fromObject(resultList).toString() + "");
         } else {
-            result.append(",\"" + objectName + "\":[{}]");
+            result.append(",\"hits\":[{}]");
         }
 
         // TODO: 2017/3/27 封装聚合结果

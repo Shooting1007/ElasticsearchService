@@ -1,11 +1,10 @@
-package wst.prj.es.pojo;/**
+package com.qishon.es.pojo;/**
  * Created by shuting.wu on 2017/3/14.
  */
 
+import com.qishon.es.common.SearchOperator;
+import com.qishon.es.common.SearchType;
 import lombok.*;
-import wst.prj.es.common.RangeOperator;
-import wst.prj.es.common.SearchOperator;
-import wst.prj.es.common.SearchType;
 
 import java.util.Map;
 
@@ -23,7 +22,7 @@ public class QueryParam {
      */
     private Object value= null; //搜索值
     private SearchOperator operator = SearchOperator.OR; //多关键字搜索关系 AND，OR
-    private SearchType type = null; //match,match_phrase,match_phrase_prefix...
+    private SearchType type = SearchType.MATCH; //match,match_phrase,match_phrase_prefix...
     private String queryField = "_all"; //搜索字段,默认搜索所有字段,（1）可使用通配符匹配：*name,（2）加权查询：field^2.0
     private String analyzer = null; //定义queryString的分析器，默认用字段定义的分析器或者搜索类型
     private Map<String, Object> fuzzy = null; //允许多少长度的字符纠正:Number Param,AUTO ???  (1)key={fuzziniess,prefix_length}

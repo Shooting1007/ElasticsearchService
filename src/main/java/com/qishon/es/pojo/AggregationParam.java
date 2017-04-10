@@ -1,4 +1,4 @@
-package wst.prj.es.pojo;/**
+package com.qishon.es.pojo;/**
  * Created by shuting.wu on 2017/3/24.
  */
 
@@ -6,9 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import wst.prj.es.common.AggregationType;
-
-import java.util.ArrayList;
+import com.qishon.es.common.AggregationType;
 
 /**
  * @author shuting.wu

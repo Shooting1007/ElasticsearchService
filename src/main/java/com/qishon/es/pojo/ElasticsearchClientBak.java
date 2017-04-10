@@ -1,4 +1,4 @@
-package wst.prj.es.pojo;/**
+package com.qishon.es.pojo;/**
  * Created by shuting.wu on 2017/3/13.
  */
 

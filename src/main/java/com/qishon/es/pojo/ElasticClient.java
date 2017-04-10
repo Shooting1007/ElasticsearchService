@@ -1,14 +1,14 @@
-package wst.prj.es.pojo;/**
+package com.qishon.es.pojo;/**
  * Created by shuting.wu on 2017/3/14.
  */
 
+import com.qishon.es.common.PropertiesUtil;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wst.prj.es.common.PropertiesUtil;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;

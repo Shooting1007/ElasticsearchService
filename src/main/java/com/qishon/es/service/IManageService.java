@@ -1,6 +1,6 @@
-package wst.prj.es.service;
+package com.qishon.es.service;
 
-import wst.prj.es.pojo.ElasticsearchClientBak;
+import com.qishon.es.pojo.ElasticsearchClientBak;
 
 /**
  * Created by shuting.wu on 2017/3/13.
@@ -36,7 +36,7 @@ public interface IManageService {
      * @author shuting.wu
      * @date 2017/3/13 19:02
     **/
-    public void deleteIndex(ElasticsearchClientBak client, String indexName);
+    public void deleteIndex(ElasticsearchClientBak client, String indexName) throws Exception;;
 
     /**
      * @Descrption

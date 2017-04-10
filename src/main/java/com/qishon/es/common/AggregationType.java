@@ -1,4 +1,4 @@
-package wst.prj.es.common;
+package com.qishon.es.common;
 
 /**
  * Created by shuting.wu on 2017/3/24.

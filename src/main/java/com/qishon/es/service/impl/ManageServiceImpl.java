@@ -1,10 +1,12 @@
-package wst.prj.es.service.impl;/**
+package com.qishon.es.service.impl;/**
  * Created by shuting.wu on 2017/3/13.
  */
 
+import com.qishon.es.service.IManageService;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
@@ -13,8 +15,7 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wst.prj.es.pojo.ElasticsearchClientBak;
-import wst.prj.es.service.IManageService;
+import com.qishon.es.pojo.ElasticsearchClientBak;
 
 import java.util.Date;
 
@@ -36,7 +37,6 @@ public class ManageServiceImpl implements IManageService {
      **/
     @Override
     public long createIndex(ElasticsearchClientBak client, String indexName, String typeName) throws Exception {
-        ;
         if (null == client || null == client.getTransportClient()) {
             throw new Exception("未连接搜索引擎");
         }
@@ -86,8 +86,22 @@ public class ManageServiceImpl implements IManageService {
      * @date 2017/3/13 19:02
      **/
     @Override
-    public void deleteIndex(ElasticsearchClientBak client, String indexName) {
-
+    public void deleteIndex(ElasticsearchClientBak client, String indexName) throws Exception {
+        if (null == client || null == client.getTransportClient()) {
+            throw new Exception("未连接搜索引擎");
+        }
+        try{
+            Client transportClient = client.getTransportClient();
+            DeleteResponse response = transportClient.prepareDelete().setIndex("test_index")
+                    .setOperationThreaded(false)
+                    .execute()
+                    .actionGet();
+        }catch (Exception e) {
+            LOGGER.error("elasticsearch","delete index fail",e);
+            throw new Exception("删除索引失败");
+        }finally {
+            client.closeTransportClient();
+        }
     }
 
     /**

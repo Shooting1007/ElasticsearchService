@@ -55,20 +55,16 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
         }
     },
     "mappings":{
-        "_default_":{
-            "dynamic":"strict"
-        },
-        "event":{
-            "_source":{
-                "excludes":[
-                    "lang"
-                ]
-            }
-        },
         "my_fabric_info":{
             "_analyzer":{
                 "path":"lang"
             },
+            "_source":{
+                "excludes":[
+                    "lang"
+                ]
+            },
+            "dynamic":"strict",
             "properties":{
                 "lang":{
                     "type":"string",
@@ -126,7 +122,7 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                     "analyzed":"ik_max_word"
                 },
                 "minPrice":{
-                    "type":"double"
+                    "type":"float"
                 },
                 "thumb":{
                     "type":"string",
@@ -136,13 +132,13 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                     "type":"integer"
                 },
                 "fineFlag":{
-                    "type":"integer"
+                    "type":"byte"
                 },
                 "hasVfx":{
-                    "type":"integer"
+                    "type":"byte"
                 },
                 "available":{
-                    "type":"integer"
+                    "type":"byte"
                 },
                 "supplierKey":{
                     "type":"long",
@@ -256,7 +252,7 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                             "analyzer":"ik_max_word"
                         },
                         "priceValue":{
-                            "type":"double"
+                            "type":"float"
                         }
                     }
                 }
@@ -266,7 +262,5 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
 }
 '
 #修改mapping
-curl -XPOST http://localhost:9200/my_fabric/my_fabric_info/_mapping -d '
-
-'
+#curl -XPOST http://localhost:9200/my_fabric/my_fabric_info/_mapping -d ''
 

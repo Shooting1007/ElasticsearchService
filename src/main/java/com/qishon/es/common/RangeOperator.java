@@ -1,31 +1,28 @@
-package wst.prj.es.common;
+package com.qishon.es.common;
 
 /**
- * Created by shuting.wu on 2017/3/20.
+ * Created by shuting.wu on 2017/3/24.
  */
-public enum SearchOperator {
-    /**
-     * MUST
-     */
-    AND {
+public enum RangeOperator {
+    gt{
         @Override
         public String toString() {
             return super.toString();
         }
     },
-    /**
-     * MUST_NOT
-     */
-    NOT {
+    gte{
         @Override
         public String toString() {
             return super.toString();
         }
     },
-    /**
-     * SHOULD
-     */
-    OR {
+    lt {
+        @Override
+        public String toString() {
+            return super.toString();
+        }
+    },
+    lte {
         @Override
         public String toString() {
             return super.toString();

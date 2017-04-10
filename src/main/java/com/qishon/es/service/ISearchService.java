@@ -1,9 +1,9 @@
-package wst.prj.es.service;
+package com.qishon.es.service;
 
-import wst.prj.es.pojo.AggregationParam;
-import wst.prj.es.pojo.Pagination;
-import wst.prj.es.pojo.QueryParam;
-import wst.prj.es.pojo.SortParam;
+import com.qishon.es.pojo.AggregationParam;
+import com.qishon.es.pojo.Pagination;
+import com.qishon.es.pojo.QueryParam;
+import com.qishon.es.pojo.SortParam;
 
 /**
  * Created by shuting.wu on 2017/3/13.
@@ -15,25 +15,23 @@ public interface ISearchService {
      * @param indices
      * @param types
      * @param returnFields
-     * @param objectName
      * @return
      * @author shuting.wu
      * @date 2017/4/7 15:31
     **/
-    public String commonQuery(String[] indices, String[] types, String[] returnFields,String objectName);
+    public String commonQuery(String[] indices, String[] types, String[] returnFields);
 
     /**
      * @Descrption
      * @param indices
      * @param types
      * @param returnFields
-     * @param objectName
      * @param queryParams
      * @return
      * @author shuting.wu
      * @date 2017/4/7 15:39
     **/
-    public String commonQuery(String[] indices, String[] types, String[] returnFields,String objectName, QueryParam[] queryParams);
+    public String commonQuery(String[] indices, String[] types, String[] returnFields, QueryParam[] queryParams);
 
     /**
      * @Descrption
@@ -41,12 +39,12 @@ public interface ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @return
      * @author shuting.wu
      * @date 2017/3/22 18:52
      **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination,String[] returnFields,String objectName);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination,String[] returnFields);
 
 
     /**
@@ -55,13 +53,13 @@ public interface ISearchService {
      * @param types
      * @param queryParams
      * @param pagination
-     * @param objectName
+     *
      * @param returnFields
      * @return
      * @author shuting.wu
      * @date 2017/3/20 15:28
     **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination,String[] returnFields,String objectName, QueryParam[] queryParams);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination,String[] returnFields, QueryParam[] queryParams);
 
     /**
      * @Descrption
@@ -69,14 +67,14 @@ public interface ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param aggregationParams
      * @return
      * @author shuting.wu
      * @date 2017/3/24 17:41
     **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, AggregationParam[] aggregationParams);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, AggregationParam[] aggregationParams);
 
     /**
      * @Descrption
@@ -84,14 +82,14 @@ public interface ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param sortParams
      * @return
      * @author shuting.wu
      * @date 2017/3/29 13:58
     **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, QueryParam[] queryParams, SortParam[] sortParams);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  QueryParam[] queryParams, SortParam[] sortParams);
 
     /**
      * @Descrption
@@ -99,13 +97,13 @@ public interface ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param sortParams
      * @return
      * @author shuting.wu
      * @date 2017/3/29 13:58
     **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName, SortParam[] sortParams);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields,  SortParam[] sortParams);
 
     /**
      * @Descrption
@@ -113,7 +111,7 @@ public interface ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param aggregationParams
      * @param sortParams
@@ -121,14 +119,14 @@ public interface ISearchService {
      * @author shuting.wu
      * @date 2017/3/29 14:57
     **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName,QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams);
 
     /**
      * @Descrption
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param aggregationParams
      * @param sortParams
@@ -137,7 +135,7 @@ public interface ISearchService {
      * @author shuting.wu
      * @date 2017/3/29 16:19
     **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName,QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams,String[] highLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggregationParam[] aggregationParams, SortParam[] sortParams,String[] highLightFields);
 
     /**
      * @Descrption
@@ -145,7 +143,7 @@ public interface ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param sortParams
      * @param highLightFields
@@ -153,7 +151,7 @@ public interface ISearchService {
      * @author shuting.wu
      * @date 2017/3/29 16:21
     **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName,QueryParam[] queryParams,  SortParam[] sortParams,String[] highLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams,  SortParam[] sortParams,String[] highLightFields);
 
     /**
      * @Descrption
@@ -161,7 +159,7 @@ public interface ISearchService {
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param aggregationParams
      * @param highLightFields
@@ -169,21 +167,21 @@ public interface ISearchService {
      * @author shuting.wu
      * @date 2017/3/29 16:20
     **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName,QueryParam[] queryParams, AggregationParam[] aggregationParams,String[] highLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggregationParam[] aggregationParams,String[] highLightFields);
     /**
      * @Descrption
      * @param indices
      * @param types
      * @param pagination
      * @param returnFields
-     * @param objectName
+     *
      * @param queryParams
      * @param highLightFields
      * @return
      * @author shuting.wu
      * @date 2017/3/29 16:20
     **/
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, String objectName,QueryParam[] queryParams, String[] highLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, String[] highLightFields);
 
 
     /*public String aggregate();
