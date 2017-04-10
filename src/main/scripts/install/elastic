@@ -1,0 +1,138 @@
+#! /bin/sh
+#chkconfig:345 61 61
+#description:Elastic
+#程序主目录
+cd /server/elastic
+export ES_HOME=`pwd`
+#-------------------------------------------------------------------
+# 定义变量
+#-------------------------------------------------------------------
+APP_NAME=elastic
+GREP_KEY="Diname="${APP_NAME}
+
+# -Xms512m 设置JVM堆的初始内存
+# -Xmx1024m 设置JVM堆的最大内存
+# -Dlog4j.properties 设置log4j日志文件参数，可给JAVA程序调用，调用格式是System.getProperty("log4j.properties")
+APP_OPTS="-Xrs -Xms512m -Xmx1024m -Dlog4j.properties=../conf/log4j.xml"
+
+# 程序主类
+APP_CLASS="ElasticServer"
+
+# 日志文件
+APP_LOG=/logs/elastic/server.out
+
+# 模块运行需要的lib
+APP_LIBS=./:`ls lib/*.jar | paste -s -d":" -`
+
+# 当前的类路径=当前模块的类路径+JDK的类路径
+APP_CLASSPATH=${APP_LIBS}:.:${CLASSPATH}
+
+# 检查进程是否已经在运行，如果在运行则返回1，否则返回0
+is_exist(){
+ # ps -ef : 查询所有进程
+ # grep -w "${GREP_KEY}" : 从所有进程中查出名称为HelloWorld的进程,-w为精确查找
+ # grep -v "grep" : 排除名称为grep的进程
+ # awk '{print $2}' : 输出第二个参数，也就是进程号
+ pid=`ps -ef | grep -w "${APP_CLASS}" | grep -v "grep" | awk '{print $2}'`
+
+ # 判断进程号是否为空
+ if [ -z "${pid}" ]
+  then return 1
+ else
+  return 0
+ fi
+}
+
+# 打印进程的状态信息
+status(){
+ is_exist
+ if [ $? -eq "0" ]
+  then echo "${APP_NAME} is running. pid=${pid} ."
+ else
+  echo "${APP_NAME} is not running"
+ fi
+}
+
+# 启动进程
+start(){
+ is_exist
+ if [ $? -eq "0" ]
+  then echo "${APP_NAME} is already running. pid=${pid} ."
+  return 0
+ else
+  echo "try to start ${APP_NAME} ... "
+
+  # 调用nohup命令启动HelloWorld
+  # 1>&- : 表示关闭标准输出日志到nohup.out
+  # 2>${APP_LOG} : 表示输出日志到../logs/log.log
+  # 最后的& : 表示退出帐户/关闭终端时程序不退出
+                nohup $JAVA_HOME/bin/java -${GREP_KEY} ${APP_OPTS} -classpath ${APP_CLASSPATH} ${APP_CLASS} 1>&- 2>${APP_LOG} &
+
+  # 程序的启动需要一定的时间，这里设置暂停时间(3秒)，单位是秒
+                sleep 3
+
+                is_exist
+                if [ $? -eq "0" ]
+                then
+                        echo "${APP_NAME} is running now. pid=${pid}."
+                        return 0
+                else
+                        echo "failed to start ${APP_NAME}! see ${APP_LOG} for more details."
+                        return 1
+                fi
+ fi
+}
+
+# 停止进程
+stop()
+{
+ is_exist
+
+ if [ $? -eq 0 ]
+  then  echo "try to stop ${APP_NAME} ..."
+
+   # 调用kill命令杀掉进程
+   /usr/bin/kill -9  ${pid}
+
+   if [ $? -ne 0 ]
+    then echo "failed to stop ${APP_NAME}!"
+    return 1
+   else
+    echo "${APP_NAME} stopped."
+    return 0
+   fi
+ else
+  echo "${APP_NAME} is not running!"
+  return 1
+ fi
+}
+
+# 重启进程
+restart(){
+ stop
+ start
+}
+
+# 显示帮助信息
+help()
+{
+echo "status                    show the status of ${APP_NAME} server."
+echo "start                    start the ${APP_NAME} server."
+echo "stop                      stop the ${APP_NAME} server."
+echo "restart                  restart the ${APP_NAME} server."
+}
+
+# 主函数
+main()
+{
+ case "$1" in
+ status)  status;;
+ start)    start;;
+ stop)    stop;;
+ restart)  restart;;
+ *)        echo "command param error ! see follow help "; help;;
+ esac
+}
+
+# 执行主函数 $1表示选择第一个字符串为参数，比如终端命令是：./run.sh start status，则选择start为输入参数
+main $1
