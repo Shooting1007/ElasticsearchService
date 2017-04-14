@@ -62,8 +62,8 @@
     <Loggers>
         <!-- 配置日志的根节点 -->
         <root level="debug">
-            <appender-ref ref="Console"/>
-            <!--<appender-ref ref="service_appender"/>-->
+            <!--<appender-ref ref="Console"/>-->
+            <appender-ref ref="service_appender"/>
         </root>
 
         <!-- 第三方日志系统 -->
