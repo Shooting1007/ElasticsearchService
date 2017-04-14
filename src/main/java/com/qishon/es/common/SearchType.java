@@ -25,7 +25,7 @@ public enum SearchType {
     /**
      *
      */
-    PHASE {
+    PHRASE {
         @Override
         public String toString() {
             return super.toString();

@@ -1,0 +1,140 @@
+#!/bin/bash
+curl -XPUT 'http://localhost:9200/my_company/my_company_info/1' -d '
+{
+    "companyKey":"1",
+    "companyCode":"F20170404T01",
+    "companyName":"混纺蓝白条纹涤棉氨光滑面料",
+    "regTime":"2017-04-04 22:17:00",
+    "logo":"http://image01.jsp",
+    "sort":1,
+    "fineFlag":1,
+    "available":1,
+    "authFlag":"1",
+    "province":"福建省",
+    "city":"厦门市",
+    "area":"思明区",
+    "fabricClass":[
+        {
+            "name":"棉纺",
+            "path":"/ALL/棉纺"
+        },
+        {
+            "name":"棉",
+            "path":"/ALL/棉纺/棉"
+        }
+    ]
+}
+'
+curl -XPUT 'http://localhost:9200/my_company/my_company_info/2' -d '
+{
+    "companyKey":"2",
+    "companyCode":"F20170404T02",
+    "companyName":"纯纺白色棉坯布",
+    "regTime":"2017-04-05 10:20:00",
+    "business":"纯纺系列 100%棉",
+    "logo":"http://image02.jsp",
+    "sort":2,
+    "fineFlag":0,
+    "available":1,
+    "authFlag":"1",
+    "province":"福建省",
+    "city":"厦门市",
+    "area":"思明区",
+    "fabricClass":[
+        {
+            "name":"棉",
+            "path":"/ALL/棉纺/棉"
+        }
+    ]
+}
+'
+curl -XPUT 'http://localhost:9200/my_company/my_company_info/3' -d '
+{
+    "companyKey":"3",
+    "companyCode":"F20170404T03",
+    "companyName":"纯纺涤纶红黑经典条纹",
+    "regTime":"2017-04-05 10:52:00",
+    "business":"纯纺系列 100%涤纶",
+    "logo":"http://image03.jsp",
+    "sort":1,
+    "fineFlag":1,
+    "available":1,
+    "authFlag":"0",
+    "province":"北京",
+    "city":"北京市",
+    "area":"朝阳区",
+    "fabricClass":[
+        {
+            "name":"涤纶",
+            "path":"/ALL/棉纺/涤纶"
+        }
+    ]
+}
+'
+curl -XPUT 'http://localhost:9200/my_company/my_company_info/4' -d '
+{
+    "companyKey":"4",
+    "companyCode":"F20170404T04",
+    "companyName":"经典宝蓝金属感面料",
+    "regTime":"2017-04-05 14:04:00",
+    "business":"10%棉50%羊毛40%涤纶",
+    "logo":"http://image04.jsp",
+    "sort":1,
+    "fineFlag":1,
+    "available":1,
+    "authFlag":"0",
+    "province":"北京",
+    "city":"北京市",
+    "area":"朝阳区",
+    "fabricClass":[
+        {
+            "name":"其他",
+            "path":"/ALL/其他"
+        }
+    ]
+}
+'
+curl -XPUT 'http://localhost:9200/my_company/my_company_info/5' -d '
+{
+    "companyKey":"5",
+    "companyCode":"F20170404T05",
+    "companyName":"新宝蓝光滑质感面料",
+    "business":"面料服务商",
+    "regTime":"2017-04-05 14:03:00",
+    "logo":"http://image04.jsp",
+    "sort":99,
+    "fineFlag":1,
+    "available":1,
+    "province":"北京",
+    "city":"北京市",
+    "area":"朝阳区",
+    "fabricClass":[
+        {
+            "name":"毛",
+            "path":"/ALL/其他/毛"
+        }
+    ]
+}
+'
+curl -XPUT 'http://localhost:9200/my_company/my_company_info/6' -d '
+{
+    "companyKey":"6",
+    "companyCode":"F20170404T06",
+    "companyName":"面料服务商毛料",
+    "business":"面料 毛 服务",
+    "regTime":"2017-04-05 14:03:00",
+    "logo":"http://image04.jsp",
+    "sort":99,
+    "fineFlag":1,
+    "available":1,
+    "province":"北京",
+    "city":"北京市",
+    "area":"朝阳区",
+    "fabricClass":[
+        {
+            "name":"其他",
+            "path":"/ALL/其他"
+        }
+    ]
+}
+'

@@ -1,16 +1,29 @@
 #!/bin/sh
 #删除索引
 curl -XDELETE http://localhost:9200/my_index
-#创建索引
 curl -XPUT http://localhost:9200/my_index -d '
 {
     "settings":{
         "index":{
-            "number_of_replicas":"1",
             "analysis":{
                 "analyzer":{
                     "path_analyzer":{
                         "tokenizer":"path_hierarchy"
+                    },
+                    "code_analyzer":{
+                        "char_filter":[
+                             "my_mapping"
+                         ],
+                        "filter":[
+                            "lowercase"
+                        ],
+                        "tokenizer":"my_ngram_tokenizer"
+                    },
+                    "mapping_analyzer":{
+                        "char_filter":[
+                            "my_mapping"
+                        ],
+                        "tokenizer":"standard"
                     },
                     "en":{
                         "filter":[
@@ -38,19 +51,112 @@ curl -XPUT http://localhost:9200/my_index -d '
                         "padding_char":"",
                         "type":"pinyin",
                         "first_letter":"prefix"
+                    },
+                    "my_ngram_tokenizer" : {
+                        "type" : "nGram",
+                        "min_gram": "2",
+                        "max_gram": "3",
+                        "token_chars": []
+                    }
+                },
+                "char_filter":{
+                    "my_mapping":{
+                        "type":"mapping",
+                        "mappings":[
+                            "免运费 => 0",
+                            "免邮 => 0",
+                            "包邮 => 0",
+                            ", =>  "
+                        ]
                     }
                 }
             },
-            "number_of_shards":"2",
-            "refresh_interval":"5s",
+            "number_of_shards":"1",
+            "number_of_replicas":"0",
+            "refresh_interval":"5s"
+        }
+    }
+}
+'
+#创建索引
+curl -XPUT http://localhost:9200/my_index -d '
+{
+    "settings":{
+        "index":{
+            "analysis":{
+                "analyzer":{
+                    "path_analyzer":{
+                        "tokenizer":"path_hierarchy"
+                    },
+                    "my_analyzer":{
+                        "char_filter":[
+                            "my_mapping"
+                        ],
+                        "filter":[
+                            "lowercase"
+                        ],
+                        "tokenizer":"standard"
+                    },
+                    "en":{
+                        "filter":[
+                            "asciifolding",
+                            "lowercase",
+                            "ourEnglishFilter"
+                        ],
+                        "tokenizer":"standard"
+                    },
+                    "pinyin_analyzer":{
+                        "filter":[
+                            "standard",
+                            "nGram"
+                        ],
+                        "tokenizer":"my_pinyin"
+                    }
+                },
+                "filter":{
+                    "ourEnglishFilter":{
+                        "type":"kstem"
+                    }
+                },
+                "tokenizer":{
+                    "my_pinyin":{
+                        "padding_char":"",
+                        "type":"pinyin",
+                        "first_letter":"prefix"
+                    },
+                    "my_ngram_tokenizer" : {
+                        "type" : "nGram",
+                        "min_gram" : "2",
+                        "max_gram" : "3",
+                        "token_chars": [ "letter", "whitespace" ]
+                    }
+                },
+                "char_filter":{
+                    "my_mapping":{
+                        "type":"mapping",
+                        "mappings":[
+                            "免运费 => 0",
+                            "包邮 => 0",
+                            ", =>  "
+                        ]
+                    }
+                }
+            },
+            "number_of_shards":"1",
+            "number_of_replicas":"0",
+            "refresh_interval":"5s"
         }
     },
     "mappings":{
-        "_default_" : {
-             "dynamic" : "strict"
-         },
+        "_default_":{
+            "dynamic":"strict"
+        },
         "my_type":{
             "properties":{
+                "code":{
+                    "type":"string",
+                    "analyzer":"code_analyzer"
+                },
                 "title":{
                     "type":"string",
                     "store":"yes"
@@ -58,39 +164,6 @@ curl -XPUT http://localhost:9200/my_index -d '
                 "content":{
                     "type":"string",
                     "store":"yes"
-                },
-                "messageList":{
-                    "type":"nested",
-                    "properties":{
-                        "usrKey":{
-                            "type":"long",
-                            "index":"not_analyzed"
-                        },
-                        "message":{
-                            "type":"string",
-                            "analyzer":"ik_and_word"
-                        },
-                        "msgTime":{
-                            "type":"date",
-                            "format":"yyyy-MM-dd HH:mm:ss",
-                            "store":"yes"
-                        }
-                    }
-                },
-                "category":{
-                    "type":"multi_field",
-                    "fields":{
-                        "path":{
-                            "type":"string",
-                            "store":"no",
-                            "analyzer":"path_analyzer"
-                        },
-                        "primitive":{
-                            "type":"string",
-                            "analyzer":"ik_and_word",
-                            "store":"yes"
-                        }
-                    }
                 },
                 "messageList":{
                     "type":"nested",

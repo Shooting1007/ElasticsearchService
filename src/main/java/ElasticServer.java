@@ -2,11 +2,11 @@
  * Created by shuting.wu on 2017/4/7.
  */
 
+import com.qishon.es.servlet.SearchServlet;
+import com.qishon.es.servlet.SimpleSearchServlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import com.qishon.es.common.PropertiesUtil;
-import com.qishon.es.servlet.SearchServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,8 @@ public class ElasticServer {
         context.setContextPath("/");
         server.setHandler(context);
 
-        context.addServlet(new ServletHolder(new SearchServlet()), "/search");
+        context.addServlet(new ServletHolder(new SearchServlet()), "/search/advanced");
+        context.addServlet(new ServletHolder(new SimpleSearchServlet()), "/search/simple");
 
         server.start();
         server.join();

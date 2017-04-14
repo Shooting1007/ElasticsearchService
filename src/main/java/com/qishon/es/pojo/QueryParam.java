@@ -21,8 +21,8 @@ public class QueryParam {
      * filter不计算相关性，且可以缓存，效率高于query，但是query会更精准一些
      */
     private Object value= null; //搜索值
-    private SearchOperator operator = SearchOperator.OR; //多关键字搜索关系 AND，OR
-    private SearchType type = SearchType.MATCH; //match,match_phrase,match_phrase_prefix...
+    private SearchOperator operator = SearchOperator.AND; //多关键字搜索关系 AND，OR
+    private SearchType type = SearchType.TERM; //match,match_phrase,match_phrase_prefix...
     private String queryField = "_all"; //搜索字段,默认搜索所有字段,（1）可使用通配符匹配：*name,（2）加权查询：field^2.0
     private String analyzer = null; //定义queryString的分析器，默认用字段定义的分析器或者搜索类型
     private Map<String, Object> fuzzy = null; //允许多少长度的字符纠正:Number Param,AUTO ???  (1)key={fuzziniess,prefix_length}
@@ -31,7 +31,7 @@ public class QueryParam {
     private boolean isNested = false; //是否数组
     private RangeParam range; //范围查询
     private float boost = 1.0f; //提升字段重要性，影响相关性分数，但仅为影响因素之一
-
+    private boolean isFilterMode = true;// filter查询效率高，但是不影响排名,同时agg不受影响，默认使用filter，agg只受query影响
     @Data
     public class RangeParam {
         private boolean isIncludeLower = true; //是否包含最小值

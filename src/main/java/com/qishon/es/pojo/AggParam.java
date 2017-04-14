@@ -13,11 +13,11 @@ import com.qishon.es.common.AggregationType;
  * @date 2017-03-24 16:31
  **/
 @Data @NoArgsConstructor @AllArgsConstructor @ToString
-public class AggregationParam {
+public class AggParam {
     private String aggName; //名称
     private String field; //统计字段
-    private AggregationType type; //聚合类型
+    private AggregationType type = AggregationType.TERM; //聚合类型
     private boolean isReverse = false; //nested子聚合，聚合字段为父级字段，需设置为true
-    private AggregationParam[]  nestedAggs = null; //嵌套聚合
+    private AggParam[]  nestedAggs = null; //嵌套聚合
     private int size = 100; //限制长度,用于TERM聚合
 }

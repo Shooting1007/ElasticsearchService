@@ -37,8 +37,8 @@
       "order":"升序ASC，降序DESC"
     }
   ],
-  //聚合 AggregationParam[]
-  "aggParam":[ //聚合 AggregationParam[]
+  //聚合 AggParam[]
+  "aggParam":[ //聚合 AggParam[]
     {
       "aggName":"名称",
       "field":"字段",

@@ -1,9 +1,10 @@
 package com.qishon.es.servlet;/**
- * Created by shuting.wu on 2017/4/7.
+ * Created by shuting.wu on 2017/4/11.
  */
 
 import com.qishon.es.common.CommonUtils;
 import com.qishon.es.common.JsonStrUtils;
+import com.qishon.es.common.PropertiesUtil;
 import com.qishon.es.pojo.AggParam;
 import com.qishon.es.pojo.Pagination;
 import com.qishon.es.pojo.QueryParam;
@@ -16,33 +17,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
  * @author shuting.wu
- * @date 2017-04-07 13:26
+ * @date 2017-04-11 17:08
  **/
-public class SearchServlet extends HttpServlet {
+public class PhraseServlet {
     private static final long serialVersionUID = 1L;
     private static ISearchService searchService;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchServlet.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PhraseServlet.class);
 
-    public SearchServlet() {
+    public PhraseServlet() {
 
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html");
         response.setCharacterEncoding("utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         //TODO: 索引，类型和返回字段，分页，排序，统计，高亮
         try {
             //获取参数
-            String index = request.getParameter("indics");
-            String type = request.getParameter("types");
+            String keyword = request.getParameter("keyword");
+            String origin = request.getParameter("origin");
+            String index = PropertiesUtil.getStringByKey("elasticsearch."+ origin + ".index");
+            String type = PropertiesUtil.getStringByKey("elasticsearch."+ origin + ".type");
             String returnField = request.getParameter("returnFields");
             String highLightField = request.getParameter("highLightFields");
             String queryParam = request.getParameter("queryParam");
@@ -94,5 +96,6 @@ public class SearchServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         doGet(request, response);
     }
+
 
 }

@@ -22,9 +22,9 @@
         </Console>
 
         <!-- 设置日志格式并配置日志压缩格式(service.log.年份.gz) -->
-        <RollingRandomAccessFile name="service_appender"
-                                 immediateFlush="false" fileName="${LOG_HOME}/service.log"
-                                 filePattern="${LOG_HOME}/service.log.%d{yyyy-MM-dd}.log.gz">
+        <RollingFile  name="service_appender"
+                                 immediateFlush="false" fileName="${LOG_HOME}/es.log"
+                                 filePattern="${LOG_HOME}/elastic.log.%d{yyyy-MM-dd}.log.gz">
             <!--
                 %d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间
                 %p : 日志输出格式
@@ -41,28 +41,29 @@
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M -- %msg%xEx%n</pattern>
             </PatternLayout>
             <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
-        </RollingRandomAccessFile>
+        </RollingFile>
 
 
         <!-- DEBUG日志格式 -->
-        <RollingRandomAccessFile name="service_debug_appender"
-                                 immediateFlush="false" fileName="${LOG_HOME}/service.log"
+        <RollingFile name="debug_appender"
+                                 immediateFlush="false" fileName="${LOG_HOME}/debug.log"
                                  filePattern="${LOG_HOME}/service.log.%d{yyyy-MM-dd}.debug.gz">
             <PatternLayout>
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M -- %msg%xEx%n</pattern>
             </PatternLayout>
             <Policies>
-                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
             </Policies>
-        </RollingRandomAccessFile>
+        </RollingFile>
     </Appenders>
 
     <Loggers>
         <!-- 配置日志的根节点 -->
         <root level="debug">
             <appender-ref ref="Console"/>
+            <!--<appender-ref ref="service_appender"/>-->
         </root>
 
         <!-- 第三方日志系统 -->
@@ -80,8 +81,8 @@
         </logger>
 
         <!-- 日志实例(debug) -->
-        <logger name="service_log" level="debug" includeLocation="true" additivity="false">
-            <appender-ref ref="service_debug_appender"/>
+        <logger name="debug_log" level="debug" includeLocation="true" additivity="true">
+            <appender-ref ref="debug_appender"/>
         </logger>
 
     </Loggers>

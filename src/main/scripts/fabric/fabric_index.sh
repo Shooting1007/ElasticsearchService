@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #删除索引
 curl -XDELETE http://localhost:9200/my_fabric
 #创建索引
@@ -18,6 +18,27 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                             "lowercase",
                             "ourEnglishFilter"
                         ]
+                    },
+                    "code_analyzer":{
+                        "char_filter":[
+                             "my_mapping"
+                         ],
+                        "filter":[
+                            "lowercase"
+                        ],
+                        "tokenizer":"my_ngram_tokenizer"
+                    },
+                    "strict_analyzer":{
+                        "filter":[
+                            "lowercase"
+                        ],
+                        "tokenizer":"whitespace"
+                    },
+                    "mapping_analyzer":{
+                        "char_filter":[
+                            "my_mapping"
+                        ],
+                        "tokenizer":"standard"
                     },
                     "path_analyzer":{
                         "tokenizer":"path_hierarchy"
@@ -49,7 +70,24 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                       "ik_smart": {
                         "type": "ik",
                         "use_smart": true
+                      },
+                      "my_ngram_tokenizer" : {
+                          "type" : "nGram",
+                          "min_gram": "2",
+                          "max_gram": "3",
+                          "token_chars": []
                       }
+                },
+                "char_filter":{
+                    "my_mapping":{
+                        "type":"mapping",
+                        "mappings":[
+                            "免运费 => 0",
+                            "免邮 => 0",
+                            "包邮 => 0",
+                            ", =>  "
+                        ]
+                    }
                 }
             }
         }
@@ -77,7 +115,7 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                 },
                 "fabricCode":{
                     "type":"string",
-                    "analyzed":"ik_max_word"
+                    "analyzed":"code_analyzer"
                 },
                 "fabricName":{
                     "type":"multi_field",
@@ -86,8 +124,7 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                             "type": "string",
                             "store": "no",
                             "term_vector": "with_positions_offsets",
-                            "analyzer": "pinyin_analyzer",
-                            "boost": 10
+                            "analyzer": "pinyin_analyzer"
                         },
                         "raw": {
                             "type": "string",
@@ -148,6 +185,9 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                     "type":"string",
                     "analyzed":"ik_max_word"
                 },
+                "authFlag":{
+                    "type":"byte"
+                },
                 "province":{
                     "type":"string",
                     "index":"not_analyzed"
@@ -161,48 +201,82 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                     "index":"not_analyzed"
                 },
                 "weave":{
-                    "type":"string",
-                    "analyzed":"ik_max_word"
+                    "type":"multi_field",
+                    "fields": {
+                        "pinyin": {
+                            "type": "string",
+                            "store": "no",
+                            "term_vector": "with_positions_offsets",
+                            "analyzer": "pinyin_analyzer"
+                        },
+                        "raw": {
+                            "type":"string",
+                            "analyzer":"strict_analyzer",
+                            "boost": 5
+                        }
+                    }
                 },
                 "customerTag":{
                     "type":"string",
-                    "analyzed":"not_analyzed"
+                    "analyzed":"strict_analyzer"
                 },
                 "tech":{
-                    "type":"string",
-                    "index":"not_analyzed"
+                    "type":"multi_field",
+                    "fields": {
+                        "pinyin": {
+                            "type": "string",
+                            "store": "no",
+                            "term_vector": "with_positions_offsets",
+                            "analyzer": "pinyin_analyzer"
+                        },
+                        "raw": {
+                            "type":"string",
+                            "analyzer":"strict_analyzer",
+                            "boost": 2
+                        }
+                    }
                 },
                 "tag":{
                     "type":"string",
-                    "analyzed":"not_analyzed"
+                    "analyzed":"strict_analyzer"
                 },
                 "sex":{
                     "type":"string",
-                    "analyzed":"ik_max_word"
+                    "analyzed":"ik_and_word"
                 },
                 "compsn":{
                     "properties":{
                         "name":{
                             "type":"multi_field",
-                                "fields": {
-                                    "pinyin": {
-                                        "type": "string",
-                                        "store": "no",
-                                        "term_vector": "with_positions_offsets",
-                                        "analyzer": "pinyin_analyzer",
-                                        "boost": 5
-                                    },
-                                    "raw": {
-                                        "type": "string",
-                                        "store": "yes",
-                                        "analyzer": "ik_max_word",
-                                        "boost": 5
-                                    }
+                            "fields": {
+                                "pinyin": {
+                                    "type": "string",
+                                    "store": "no",
+                                    "term_vector": "with_positions_offsets",
+                                    "analyzer": "pinyin_analyzer"
+                                },
+                                "raw": {
+                                    "type": "string",
+                                    "store": "yes",
+                                    "index": "not_analyzed",
+                                    "boost": 5
                                 }
+                            }
                         },
                         "path":{
-                            "type":"string",
-                            "analyzed":"path_analyzer"
+                            "type":"multi_field",
+                            "fields": {
+                                "tree": {
+                                    "type":"string",
+                                     "analyzed":"path_analyzer"
+                                },
+                                "raw": {
+                                    "type": "string",
+                                    "store": "no",
+                                    "analyzer": "simple",
+                                    "boost": 5
+                                }
+                            }
                         }
                     }
                 },
@@ -215,32 +289,62 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                                     "type": "string",
                                     "store": "no",
                                     "term_vector": "with_positions_offsets",
-                                    "analyzer": "pinyin_analyzer",
-                                    "boost": 2
+                                    "analyzer": "pinyin_analyzer"
                                 },
                                 "raw": {
                                     "type": "string",
                                     "store": "yes",
-                                    "analyzer": "ik_max_word",
-                                    "boost": 2
+                                    "index": "not_analyzed",
+                                    "boost": 5
                                 }
                             }
                         },
                         "path":{
-                            "type":"string",
-                            "analyzed":"path_analyzer"
+                            "type":"multi_field",
+                            "fields": {
+                                "tree": {
+                                    "type":"string",
+                                     "analyzed":"path_analyzer"
+                                },
+                                "raw": {
+                                    "type": "string",
+                                    "store": "no",
+                                    "analyzer": "simple",
+                                    "boost": 5
+                                }
+                            }
                         }
                     }
                 },
                 "sampleClass":{
                     "properties":{
                         "name":{
-                            "type":"string",
-                            "analyzed":"ik_max_word"
+                            "type":"multi_field",
+                            "fields":{
+                                "raw": {
+                                    "type":"string",
+                                     "index":"not_analyzed"
+                                },
+                                "word":{
+                                    "type":"string",
+                                    "analyzed":"ik_max_word"
+                                }
+                            }
                         },
                         "path":{
-                            "type":"string",
-                            "analyzed":"path_analyzer"
+                            "type":"multi_field",
+                            "fields": {
+                                "tree": {
+                                    "type":"string",
+                                     "analyzed":"path_analyzer"
+                                },
+                                "raw": {
+                                    "type": "string",
+                                    "store": "no",
+                                    "analyzer": "simple",
+                                    "boost": 2
+                                }
+                            }
                         }
                     }
                 },
@@ -263,4 +367,5 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
 '
 #修改mapping
 #curl -XPOST http://localhost:9200/my_fabric/my_fabric_info/_mapping -d ''
+
 

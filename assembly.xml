@@ -5,22 +5,29 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>elastic</baseDirectory>
+    <baseDirectory>es</baseDirectory>
 
     <fileSets>
         <fileSet>
             <directory>src/main/scripts</directory>
-            <outputDirectory>bin</outputDirectory>
+            <outputDirectory>scripts</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>src/main/resources</directory>
-            <outputDirectory>conf</outputDirectory>
+            <directory>target/classes</directory>
+            <outputDirectory>bin</outputDirectory>
         </fileSet>
+        <!--<fileSet>
+            <directory>src/main/resources</directory>
+            <outputDirectory>bin</outputDirectory>
+        </fileSet>-->
     </fileSets>
     <dependencySets>
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
             <scope>runtime</scope>
+            <excludes>
+                   <exclude>esservice-*.jar</exclude>
+            </excludes>
         </dependencySet>
     </dependencySets>
 </assembly>

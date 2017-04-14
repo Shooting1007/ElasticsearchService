@@ -1,3 +1,4 @@
+#!/bin/bash
 curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/1' -d '
 {
     "fabricKey":"1",
@@ -17,6 +18,7 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/1' -d '
     "available":1,
     "supplierKey":1,
     "supplierName":"吴树婷的测试面料商",
+    "authFlag":"1",
     "province":"福建省",
     "city":"厦门市",
     "area":"思明区",
@@ -97,6 +99,7 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/2' -d '
     "available":1,
     "supplierKey":1,
     "supplierName":"吴树婷的测试面料商",
+    "authFlag":"1",
     "province":"福建省",
     "city":"厦门市",
     "area":"思明区",
@@ -172,6 +175,7 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/3' -d '
     "available":1,
     "supplierKey":2,
     "supplierName":"其他测试面料商",
+    "authFlag":"0",
     "province":"北京",
     "city":"北京市",
     "area":"朝阳区",
@@ -246,6 +250,7 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/4' -d '
     "available":1,
     "supplierKey":2,
     "supplierName":"其他测试面料商",
+    "authFlag":"0",
     "province":"北京",
     "city":"北京市",
     "area":"朝阳区",
@@ -344,6 +349,80 @@ curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/5' -d '
         {
             "name":"涤纶",
             "path":"/ALL/混纺/涤纶"
+        }
+    ],
+    "customerTag":[
+        "_all"
+    ],
+    "tech":[
+        "熨"
+    ],
+    "tag":[
+        "水洗"
+    ],
+    "sex":[
+        "男装",
+        "女装"
+    ],
+    "fabricClass":[
+        {
+            "name":"其他",
+            "path":"/ALL/其他"
+        }
+    ],
+    "sampleClass":[
+        {
+            "name":"衬衫",
+            "path":"/ALL/上装/衬衫"
+        },
+        {
+            "name":"裙子",
+            "path":"/ALL/下装/裙子"
+        }
+    ],
+    "stepPrice":[
+        {
+            "priceName":"小于100米",
+            "priceValue":1000
+        },
+        {
+            "priceName":"大于100米小于2000米",
+            "priceValue":900
+        },
+        {
+            "priceName":"大于2000米",
+            "priceValue":800
+        }
+    ]
+}
+'
+curl -XPUT 'http://localhost:9200/my_fabric/my_fabric_info/6' -d '
+{
+    "fabricKey":"6",
+    "fabricCode":"E20170413T01",
+    "fabricName":"羊毛纯纺水洗不起球",
+    "uploadTime":"2017-04-05 14:03:00",
+    "yarnCount":"50/枝",
+    "weight":"30g/m",
+    "width":"800",
+    "serial":"纯纺系列",
+    "compsnDesc":"100%羊毛",
+    "minPrice":"890.00",
+    "thumb":"http://image04.jsp",
+    "sort":99,
+    "fineFlag":1,
+    "hasVfx":1,
+    "available":1,
+    "supplierKey":2,
+    "supplierName":"其他测试面料商",
+    "province":"北京",
+    "city":"北京市",
+    "area":"朝阳区",
+    "weave":"梭织",
+    "compsn":[
+        {
+            "name":"针织羊毛衫",
+            "path":"/ALL/其他/羊毛"
         }
     ],
     "customerTag":[

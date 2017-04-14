@@ -43,7 +43,7 @@ public class ElasticClient {
             client = (TransportClient) constructor.newInstance(settings);
             client.addTransportAddress(new InetSocketTransportAddress(host, port));
         } catch (Exception e) {
-            LOGGER.error("elasticsearch conent fail...",e);
+            LOGGER.error("elasticsearch connect fail...",e);
         }
     }
 
