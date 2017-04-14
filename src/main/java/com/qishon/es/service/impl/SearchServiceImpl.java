@@ -47,14 +47,14 @@ public class SearchServiceImpl implements ISearchService {
      * @param queryParams
      * @param aggParams
      * @param sortParams
-     * @param hightLightFields
+     * @param highLightFields
      * @return
      * @author shuting.wu
      * @date 2017/4/12 21:08
      */
     @Override
-    public String commonQuery(String origin, String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] hightLightFields) {
-        return query(origin, indices, types, pagination, returnFields, queryParams, aggParams, sortParams, hightLightFields);
+    public String commonQuery(String origin, String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields) {
+        return query(origin, indices, types, pagination, returnFields, queryParams, aggParams, sortParams, highLightFields);
     }
 
     /**
@@ -65,14 +65,14 @@ public class SearchServiceImpl implements ISearchService {
      * @param queryParams
      * @param aggParams
      * @param sortParams
-     * @param hightLightFields
+     * @param highLightFields
      * @return
      * @author shuting.wu
      * @date 2017/4/12 21:08
      */
     @Override
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] hightLightFields) {
-        return query(null, indices, types, pagination, returnFields, queryParams, aggParams, sortParams, hightLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields) {
+        return query(null, indices, types, pagination, returnFields, queryParams, aggParams, sortParams, highLightFields);
     }
 
     /**
@@ -86,9 +86,18 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/20 11:31
      **/
 
-    private String query(String origin, String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] hightLightFields) {
+    private String query(String origin, String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields) {
         try {
             long begin = new Date().getTime();
+
+            if(indices == null || indices.length == 0) {
+                indices = PropertiesUtil.getStringByKey("es."+ origin + ".index").split(",");
+                types = PropertiesUtil.getStringByKey("es."+ origin + ".type").split(",");
+            }
+
+            if(returnFields == null || returnFields.length == 0) {
+                returnFields = PropertiesUtil.getStringByKey("es."+ origin + ".return").split(",");
+            }
 
             // TODO: 2017/3/29  查询
             SearchRequestBuilder srb = new SearchRequestBuilder(ElasticClient.getTransportClient());
@@ -96,40 +105,40 @@ public class SearchServiceImpl implements ISearchService {
 
             // TODO: 2017/3/29 转换查询参数
             Map<String, Object> builders = null;
-            QueryBuilder queryBuilder = null;
-            BoolFilterBuilder filterBuilder = new BoolFilterBuilder();
+            BoolQueryBuilder queryBuilder = null;
+            BoolFilterBuilder filterBuilder = null;
             if (null != queryParams && queryParams.length > 0) {
                 builders = this.parseQuery(queryParams, origin);
                 if (builders.get("query") != null) {
-                    queryBuilder = (QueryBuilder) builders.get("query");
+                    queryBuilder = (BoolQueryBuilder) builders.get("query");
                 }
                 if (builders.get("filter") != null) {
-                    filterBuilder.must((FilterBuilder) builders.get("filter"));
+                    filterBuilder = (BoolFilterBuilder) builders.get("filter");
                 }
 
             }
             String defaultFilters = PropertiesUtil.getStringByKey("es." + origin + ".defaultFilters");
+            BoolFilterBuilder defaultFilterBuilder = null;
             if (!StringUtils.isEmpty(defaultFilters)) {
+                defaultFilterBuilder = new BoolFilterBuilder();
                 for (String df : defaultFilters.split(",")) {
-                    filterBuilder.must(FilterBuilders.termFilter(StringUtils.substringBefore(df, ":"), StringUtils.substringAfter(df, ":")));
+                    defaultFilterBuilder.must(FilterBuilders.termFilter(StringUtils.substringBefore(df, ":"), StringUtils.substringAfter(df, ":")));
                 }
             }
             //TODO 2017/3/29  设置查询条件
-            if (queryBuilder != null) {
-                srb.setQuery(queryBuilder);
-            }
+            srb.setQuery(QueryBuilders.filteredQuery(queryBuilder,defaultFilterBuilder));
             if (filterBuilder != null) {
                 srb.setPostFilter(filterBuilder);
             }
             //TODO 2017/3/29  设置聚合参数
             if (aggParams != null && aggParams.length > 0) {
                 for (AggParam aggParam : aggParams) {
-                    srb.addAggregation(this.parseAggregation(aggParam));
+                    srb.addAggregation(this.parseAggregation(aggParam,origin));
                 }
             }
             //TODO 2017/3/29  设置高亮
-            if (hightLightFields != null && hightLightFields.length > 0) {
-                for (String field : hightLightFields) {
+            if (highLightFields != null && highLightFields.length > 0) {
+                for (String field : highLightFields) {
                     srb.addHighlightedField(field);
                 }
                 //srb.addHighlightedField("_source");
@@ -224,12 +233,14 @@ public class SearchServiceImpl implements ISearchService {
                             .boost(queryParam.getBoost());
                     break;
                 case TERM:
+                    if(PropertiesUtil.getStringByKey("es." + origin + ".rawFields").contains(field)) {
+                        field = field + ".raw";
+                    }
                     if(queryParam.isFilterMode()) {
                         filterBuilder = FilterBuilders.termsFilter(field,value.toString().split(","));
                     } else {
                         queryBuilder = QueryBuilders.termsQuery(field,value.toString().split(","));
                     }
-
 
                     //queryBuilder = QueryBuilders.termQuery(field, value);
                     break;
@@ -311,47 +322,52 @@ public class SearchServiceImpl implements ISearchService {
      * @author shuting.wu
      * @date 2017/3/26 16:34
      **/
-    private AbstractAggregationBuilder parseAggregation(AggParam aggParam) {
+    private AbstractAggregationBuilder parseAggregation(AggParam aggParam,String origin) throws Exception{
+        String field = aggParam.getField();
         if (StringUtils.isEmpty(aggParam.getAggName())) {
             aggParam.setAggName(aggParam.getField());
         }
         AggregationBuilder aggBuilder = null;
         MetricsAggregationBuilder metricsBuilder = null;
+
+        if(PropertiesUtil.getStringByKey("es." + origin + ".rawFields").contains(field)) {
+            field = field + ".raw";
+        }
         switch (aggParam.getType()) {
             case GLOBAL:
                 aggBuilder = AggregationBuilders.global(aggParam.getAggName());
                 break;
             case TERM:
-                aggBuilder = AggregationBuilders.terms(aggParam.getAggName()).field(aggParam.getField())
+                aggBuilder = AggregationBuilders.terms(aggParam.getAggName()).field(field)
                         .size(aggParam.getSize());
                 break;
             case NESTED:
                 if (aggParam.isReverse()) {
-                    aggBuilder = AggregationBuilders.reverseNested(aggParam.getAggName()).path(aggParam.getField());
+                    aggBuilder = AggregationBuilders.reverseNested(aggParam.getAggName()).path(field);
                 } else {
-                    aggBuilder = AggregationBuilders.nested(aggParam.getAggName()).path(aggParam.getField());
+                    aggBuilder = AggregationBuilders.nested(aggParam.getAggName()).path(field);
                 }
                 break;
             case IS_NULL:
                 aggBuilder = AggregationBuilders.missing(aggParam.getAggName());
                 break;
             case DATE_HISTOGRAM:
-                aggBuilder = AggregationBuilders.dateHistogram(aggParam.getAggName()).field(aggParam.getField());
+                aggBuilder = AggregationBuilders.dateHistogram(aggParam.getAggName()).field(field);
                 break;
             case METRICS_MAX:
-                metricsBuilder = AggregationBuilders.max(aggParam.getAggName()).field(aggParam.getField());
+                metricsBuilder = AggregationBuilders.max(aggParam.getAggName()).field(field);
                 break;
             case METRICS_MIN:
-                metricsBuilder = AggregationBuilders.min(aggParam.getAggName()).field(aggParam.getField());
+                metricsBuilder = AggregationBuilders.min(aggParam.getAggName()).field(field);
                 break;
             case METRICS_SUM:
-                metricsBuilder = AggregationBuilders.sum(aggParam.getAggName()).field(aggParam.getField());
+                metricsBuilder = AggregationBuilders.sum(aggParam.getAggName()).field(field);
                 break;
             case METRICS_AVG:
-                metricsBuilder = AggregationBuilders.avg(aggParam.getAggName()).field(aggParam.getField());
+                metricsBuilder = AggregationBuilders.avg(aggParam.getAggName()).field(field);
                 break;
             case METRICS_STATS:
-                metricsBuilder = AggregationBuilders.stats(aggParam.getAggName()).field(aggParam.getField());
+                metricsBuilder = AggregationBuilders.stats(aggParam.getAggName()).field(field);
                 break;
             default:
                 break;
@@ -362,7 +378,7 @@ public class SearchServiceImpl implements ISearchService {
         // TODO: 2017/3/26 下级聚合
         if (aggParam.getNestedAggs() != null && aggParam.getNestedAggs().length > 0) {
             for (AggParam subAggParam : aggParam.getNestedAggs()) {
-                aggBuilder = aggBuilder.subAggregation(parseAggregation(subAggParam));
+                aggBuilder = aggBuilder.subAggregation(parseAggregation(subAggParam,origin));
             }
         }
         return aggBuilder;

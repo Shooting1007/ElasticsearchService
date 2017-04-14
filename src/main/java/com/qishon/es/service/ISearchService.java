@@ -20,12 +20,13 @@ public interface ISearchService {
      * @param queryParams
      * @param aggParams
      * @param sortParams
-     * @param hightLightFields
+     * @param highLightFields
      * @return
      * @author shuting.wu
      * @date 2017/4/12 21:08
      */
-    public String commonQuery(String origin,String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] hightLightFields);
+    public String commonQuery(String origin,String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields);
+
 
     /**
      *
@@ -36,12 +37,12 @@ public interface ISearchService {
      * @param queryParams
      * @param aggParams
      * @param sortParams
-     * @param hightLightFields
+     * @param highLightFields
      * @return
      * @author shuting.wu
      * @date 2017/4/12 21:08
      */
-    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] hightLightFields);
+    public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields);
 
     /**
      *

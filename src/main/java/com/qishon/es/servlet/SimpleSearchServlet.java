@@ -53,24 +53,16 @@ public class SimpleSearchServlet  extends HttpServlet {
             String highLightFlag= request.getParameter("highLightFlag");
             String returnField = request.getParameter("returnFields");
             String range = request.getParameter("range");
+            if(StringUtils.isEmpty(origin)){
+                throw new Exception("Error 999:parameters error(origin)");
+            }
             LOGGER.info("查询参数：" + CommonUtils.getIpAddr(request)
                     + ",keyword=" + keyword + ",origin=" + origin + ",filters=" + filters
                     + ",aggFields=" + aggFields + ",aggSize=" + aggSize + ",sortParam=" + sortParam
                     + ",highLightFlag=" + highLightFlag + ",returnField="+ returnField);
-            if(StringUtils.isEmpty(origin)){
-                throw new Exception("Error 999:parameters error(origin)");
-            }
-            //参数处理
-            String index = PropertiesUtil.getStringByKey("es."+ origin + ".index");
-            String type = PropertiesUtil.getStringByKey("es."+ origin + ".type");
-            if(StringUtils.isEmpty(returnField)) {
-                returnField = PropertiesUtil.getStringByKey("es."+ origin + ".return");
-            }
 
-            String[] indices = index.split(",");
-            String[] types = type.split(",");
             //返回字段
-            String[] returnFields = returnField.split(",");
+            String[] returnFields = !StringUtils.isEmpty(returnField)?returnField.split(","):null;
             //高亮
             String[] highLightFields = (!StringUtils.equals(highLightFlag,"1")?null:returnFields);
 
@@ -153,7 +145,7 @@ public class SimpleSearchServlet  extends HttpServlet {
             if(searchService == null) {
                 searchService = new SearchServiceImpl();
             }
-            String result = searchService.commonQuery(origin,indices,types,pagination,returnFields,queryParams,aggParams,sortParams,highLightFields);
+            String result = searchService.commonQuery(origin,null,null,pagination,returnFields,queryParams,aggParams,sortParams,highLightFields);
             response.getWriter().println(result);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(),e);
