@@ -1,8 +1,8 @@
 #!/bin/bash
 #删除索引
-curl -XDELETE http://localhost:9200/my_fabric
+curl -XDELETE http://localhost:9200/my_fabric_v1
 #创建索引
-curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
+curl -XPUT http://localhost:9200/my_fabric_v1?pretty=true -d '
 {
     "settings":{
         "index":{
@@ -150,6 +150,10 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                     "type":"string",
                     "index":"not_analyzed"
                 },
+                "density":{
+                    "type":"string",
+                    "index":"not_analyzed"
+                },
                 "serial":{
                     "type":"string",
                     "index":"not_analyzed"
@@ -215,6 +219,10 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
                             "boost": 5
                         }
                     }
+                },
+                "companyKey":{
+                    "type":"string",
+                    "analyzed":"strict_analyzer"
                 },
                 "customerTag":{
                     "type":"string",
@@ -367,5 +375,18 @@ curl -XPUT http://localhost:9200/my_fabric?pretty=true -d '
 '
 #修改mapping
 #curl -XPOST http://localhost:9200/my_fabric/my_fabric_info/_mapping -d ''
+#创建别名
+curl -XPOST http://localhost:9200/_aliases -d'
+{
+    "actions" : [
+        {"remove" : { "index" : "my_fabric_v1", "alias" : "my_fabric" }}
+    ]
+}'
+curl -XPOST http://localhost:9200/_aliases -d'
+{
+    "actions" : [
+        {"add" : { "index" : "my_fabric_v1", "alias" : "my_fabric" }}
+    ]
+}'
 
 

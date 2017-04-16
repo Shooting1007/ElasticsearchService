@@ -1,8 +1,8 @@
 #!/bin/bash
 #删除索引
-curl -XDELETE http://localhost:9200/my_company
+curl -XDELETE http://localhost:9200/my_company_v1
 #创建索引
-curl -XPUT http://localhost:9200/my_company?pretty=true -d '
+curl -XPUT http://localhost:9200/my_company_v1?pretty=true -d '
 {
     "settings":{
         "index":{
@@ -136,6 +136,18 @@ curl -XPUT http://localhost:9200/my_company?pretty=true -d '
                     "type":"string",
                     "analyzed":"ik_max_word"
                 },
+                "contactPhone":{
+                    "type":"string",
+                    "index":"not_analyzed"
+                },
+                "contactName":{
+                    "type":"string",
+                    "index":"not_analyzed"
+                },
+                "contactAddr":{
+                    "type":"string",
+                    "analyzed":"ik_max_word"
+                },
                 "logo":{
                     "type":"string",
                     "index":"not_analyzed"
@@ -203,3 +215,16 @@ curl -XPUT http://localhost:9200/my_company?pretty=true -d '
     }
 }
 '
+#创建别名
+curl -XPOST http://localhost:9200/_aliases -d'
+{
+    "actions" : [
+        {"remove" : { "index" : "my_company_v1", "alias" : "my_company" }}
+    ]
+}'
+curl -XPOST http://localhost:9200/_aliases -d'
+{
+    "actions" : [
+        {"add" : { "index" : "my_company_v1", "alias" : "my_company" }}
+    ]
+}'
