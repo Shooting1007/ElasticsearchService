@@ -8,10 +8,10 @@
     <baseDirectory>es</baseDirectory>
 
     <fileSets>
-        <fileSet>
+        <!--<fileSet>
             <directory>src/main/scripts</directory>
             <outputDirectory>scripts</outputDirectory>
-        </fileSet>
+        </fileSet>-->
         <fileSet>
             <directory>target/classes</directory>
             <outputDirectory>bin</outputDirectory>
@@ -26,7 +26,7 @@
             <outputDirectory>lib</outputDirectory>
             <scope>runtime</scope>
             <excludes>
-                   <exclude>esservice-*.jar</exclude>
+                   <exclude>es-*.jar</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

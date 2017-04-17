@@ -5,16 +5,14 @@ package com.qishon.es.service.impl;
 
 import com.qishon.es.common.JsonStrUtils;
 import com.qishon.es.common.PropertiesUtil;
-import com.qishon.es.common.SearchOperator;
-import com.qishon.es.common.SearchType;
+import com.qishon.es.enums.SearchOperator;
+import com.qishon.es.enums.SearchType;
 import com.qishon.es.pojo.*;
 import com.qishon.es.service.ISearchService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.queries.BooleanFilter;
-import org.apache.lucene.queryparser.xml.builders.BooleanFilterBuilder;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.text.Text;

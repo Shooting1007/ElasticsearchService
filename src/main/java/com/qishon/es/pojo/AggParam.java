@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import com.qishon.es.common.AggregationType;
+import com.qishon.es.enums.AggregationType;
 
 /**
  * @author shuting.wu

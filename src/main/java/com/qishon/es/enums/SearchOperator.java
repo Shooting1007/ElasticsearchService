@@ -1,28 +1,31 @@
-package com.qishon.es.common;
+package com.qishon.es.enums;
 
 /**
- * Created by shuting.wu on 2017/3/24.
+ * Created by shuting.wu on 2017/3/20.
  */
-public enum RangeOperator {
-    gt{
+public enum SearchOperator {
+    /**
+     * MUST
+     */
+    AND {
         @Override
         public String toString() {
             return super.toString();
         }
     },
-    gte{
+    /**
+     * MUST_NOT
+     */
+    NOT {
         @Override
         public String toString() {
             return super.toString();
         }
     },
-    lt {
-        @Override
-        public String toString() {
-            return super.toString();
-        }
-    },
-    lte {
+    /**
+     * SHOULD
+     */
+    OR {
         @Override
         public String toString() {
             return super.toString();

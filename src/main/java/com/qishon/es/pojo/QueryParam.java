@@ -2,8 +2,8 @@ package com.qishon.es.pojo;/**
  * Created by shuting.wu on 2017/3/14.
  */
 
-import com.qishon.es.common.SearchOperator;
-import com.qishon.es.common.SearchType;
+import com.qishon.es.enums.SearchOperator;
+import com.qishon.es.enums.SearchType;
 import lombok.*;
 
 import java.util.Map;

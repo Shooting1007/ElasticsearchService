@@ -1,4 +1,4 @@
-package com.qishon.es.common;
+package com.qishon.es.enums;
 
 /**
  * Created by shuting.wu on 2017/3/20.
