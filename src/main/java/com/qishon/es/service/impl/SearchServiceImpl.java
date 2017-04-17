@@ -40,8 +40,6 @@ public class SearchServiceImpl implements ISearchService {
 
     /**
      * @param origin
-     * @param indices
-     * @param types
      * @param pagination
      * @param returnFields
      * @param queryParams
@@ -53,8 +51,27 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/4/12 21:08
      */
     @Override
-    public String commonQuery(String origin, String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields) {
-        return query(origin, indices, types, pagination, returnFields, queryParams, aggParams, sortParams, highLightFields);
+    public String commonQuery(String origin, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields) {
+        return query(origin, null, null, pagination, returnFields, queryParams, aggParams, sortParams, highLightFields,null);
+    }
+
+    /**
+     * @param origin
+     * @param pagination
+     * @param returnFields
+     * @param queryParams
+     * @param aggParams
+     * @param sortParams
+     * @param highLightFields
+     * @param highLightTags
+     * @return
+     * @Descrption
+     * @author shuting.wu
+     * @date 2017/4/17 10:24
+     **/
+    @Override
+    public String commonQuery(String origin,Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields, String highLightTags) {
+        return query(origin,null,null, pagination, returnFields, queryParams, aggParams, sortParams, highLightFields,highLightTags);
     }
 
     /**
@@ -72,7 +89,7 @@ public class SearchServiceImpl implements ISearchService {
      */
     @Override
     public String commonQuery(String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields) {
-        return query(null, indices, types, pagination, returnFields, queryParams, aggParams, sortParams, highLightFields);
+        return query(null, indices, types, pagination, returnFields, queryParams, aggParams, sortParams, highLightFields,null);
     }
 
     /**
@@ -86,7 +103,7 @@ public class SearchServiceImpl implements ISearchService {
      * @date 2017/3/20 11:31
      **/
 
-    private String query(String origin, String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields) {
+    private String query(String origin, String[] indices, String[] types, Pagination pagination, String[] returnFields, QueryParam[] queryParams, AggParam[] aggParams, SortParam[] sortParams, String[] highLightFields,String highLightTags) {
         try {
             long begin = new Date().getTime();
 
@@ -143,8 +160,14 @@ public class SearchServiceImpl implements ISearchService {
                 }
                 //srb.addHighlightedField("_source");
                 //srb.addHighlightedField("_all");
-                srb.setHighlighterPreTags(PropertiesUtil.getStringByKey("highlighterPreTags"));
-                srb.setHighlighterPostTags(PropertiesUtil.getStringByKey("highlighterPostTags"));
+                if(!StringUtils.isEmpty(highLightTags)) {
+                    srb.setHighlighterPreTags(highLightTags.split(",")[0]);
+                    srb.setHighlighterPostTags(highLightTags.split(",")[1]);
+                }else {
+                    srb.setHighlighterPreTags(PropertiesUtil.getStringByKey("highlighterPreTags"));
+                    srb.setHighlighterPostTags(PropertiesUtil.getStringByKey("highlighterPostTags"));
+                }
+
             }
             //TODO 2017/3/29  设置排序
             if (sortParams != null && sortParams.length > 0) {

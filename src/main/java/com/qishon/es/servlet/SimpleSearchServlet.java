@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author shuting.wu
@@ -41,7 +42,7 @@ public class SimpleSearchServlet extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
         String format = null;
         StringBuffer result = null;
-        String queryResult = null;
+        String queryResult;
         //TODO: 索引，类型和返回字段，分页，排序，统计，高亮
         try {
             //获取参数
@@ -68,7 +69,19 @@ public class SimpleSearchServlet extends HttpServlet {
             //返回字段
             String[] returnFields = !StringUtils.isEmpty(returnField) ? returnField.split(",") : null;
             //高亮
-            String[] highLightFields = (!StringUtils.equals(highLightFlag, "1") ? null : returnFields);
+            String[] highLightFields = null;
+            String highLightTags = null;
+            if (!StringUtils.isEmpty(highLightFlag) && StringUtils.equals(highLightFlag.split(",")[0], "1")) {
+                String[] highLightParams = highLightFlag.split(",");
+                if (highLightParams.length > 2 && !StringUtils.isEmpty(highLightParams[1]) && !StringUtils.isEmpty(highLightParams[2])) {
+                    highLightTags = highLightParams[1] + "," + highLightParams[2];
+                } else {
+                    highLightFields = returnFields;
+                }
+                if (highLightParams.length > 3) {
+                    highLightFields = Arrays.copyOfRange(highLightParams, 3, highLightParams.length);
+                }
+            }
 
             //分页
             Pagination pagination = new Pagination();
@@ -150,7 +163,7 @@ public class SimpleSearchServlet extends HttpServlet {
                 searchService = new SearchServiceImpl();
             }
             result = new StringBuffer();
-            queryResult = searchService.commonQuery(origin, null, null, pagination, returnFields, queryParams, aggParams, sortParams, highLightFields);
+            queryResult = searchService.commonQuery(origin, pagination, returnFields, queryParams, aggParams, sortParams, highLightFields,highLightTags);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -159,7 +172,7 @@ public class SimpleSearchServlet extends HttpServlet {
         if (!StringUtils.isEmpty(format)) {
             String code = "200";
             String msg = "操作成功！";
-            if(queryResult.toLowerCase().contains("error")) {
+            if (queryResult.toLowerCase().contains("error")) {
                 code = "999";
                 msg = queryResult;
             }
@@ -169,7 +182,7 @@ public class SimpleSearchServlet extends HttpServlet {
                     result.append(code);
                     result.append("\",\"msg\":\"");
                     result.append(msg);
-                    result.append("\",\"info\":" );
+                    result.append("\",\"info\":");
                     result.append(queryResult);
                     result.append("}}");
                     break;
@@ -177,7 +190,7 @@ public class SimpleSearchServlet extends HttpServlet {
                     result.append(queryResult);
                     break;
             }
-        }else{
+        } else {
             result.append(queryResult);
         }
         response.getWriter().println(result);
