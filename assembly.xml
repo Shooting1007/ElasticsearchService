@@ -8,10 +8,10 @@
     <baseDirectory>es</baseDirectory>
 
     <fileSets>
-        <!--<fileSet>
-            <directory>src/main/scripts</directory>
+        <fileSet>
+            <directory>src/main/scripts/install</directory>
             <outputDirectory>scripts</outputDirectory>
-        </fileSet>-->
+        </fileSet>
         <fileSet>
             <directory>target/classes</directory>
             <outputDirectory>bin</outputDirectory>
