@@ -3,11 +3,14 @@ package com.qishon.es.pojo;/**
  */
 
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetAddress;
 
 /**
  * @author shuting.wu
@@ -15,7 +18,7 @@ import org.slf4j.LoggerFactory;
  **/
 public class ElasticsearchClientBak {
     private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchClientBak.class);
-    private Client client = null;
+    private TransportClient client = null;
     private Settings settings = null;
 
     private String hostUrl;
@@ -33,7 +36,8 @@ public class ElasticsearchClientBak {
     public ElasticsearchClientBak(String hostUrl, int port) {
         this.hostUrl = hostUrl;
         this.port = port;
-        this.settings = ImmutableSettings.settingsBuilder().build();
+        //this.settings = ImmutableSettings.settingsBuilder().build();
+        this.settings = Settings.EMPTY;
     }
 
     /**
@@ -49,7 +53,7 @@ public class ElasticsearchClientBak {
         this.hostUrl = hostUrl;
         this.port = port;
         this.clusterName = clusterName;
-        this.settings = ImmutableSettings.settingsBuilder()
+        this.settings = Settings.builder()
                 .put("clusterName",this.clusterName) //集群名称
                 .put("client.transport.sniff", true) //自动嗅探，获取集群所有节点
                 .build();
@@ -64,8 +68,8 @@ public class ElasticsearchClientBak {
     **/
    public Client getTransportClient(){
         try{
-            client = new org.elasticsearch.client.transport.TransportClient(settings)
-                    .addTransportAddress(new InetSocketTransportAddress(hostUrl, port));
+            client = new PreBuiltTransportClient(settings)
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(hostUrl), port));
         }catch (Exception e) {
             LOGGER.error("elasticsearch","connet es fail",e);
         }

@@ -39,7 +39,7 @@ public class PropertiesUtil {
     public static Map<String, Object> getPropertiesByPrefix(String prefix) {
         Map<String, Object> propertyValues = new HashMap<String, Object>();
         Iterator<String> iterator = resource.keySet().iterator();
-        String propertyKey = null;
+        String propertyKey;
         while (iterator.hasNext()) {
             propertyKey = iterator.next();
             if (propertyKey.startsWith(prefix)) {

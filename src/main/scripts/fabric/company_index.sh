@@ -8,7 +8,7 @@ curl -XPUT http://localhost:9200/my_company_v1?pretty=true -d '
         "index":{
             "number_of_replicas":"0",
             "number_of_shards":"1",
-            "refresh_integererval":"5s",
+            "refresh_interval":"5s",
             "analysis":{
                 "analyzer":{
                     "en":{
@@ -19,10 +19,16 @@ curl -XPUT http://localhost:9200/my_company_v1?pretty=true -d '
                             "ourEnglishFilter"
                         ]
                     },
-                    "code_analyzer":{
+                    "mapping_analyzer":{
                         "char_filter":[
                              "my_mapping"
                          ],
+                        "filter":[
+                            "lowercase"
+                        ],
+                        "tokenizer":"my_ngram_tokenizer"
+                    },
+                    "ik_and_word": {
                         "filter":[
                             "lowercase"
                         ],
@@ -61,10 +67,6 @@ curl -XPUT http://localhost:9200/my_company_v1?pretty=true -d '
                     }
                 },
                 "tokenizer" : {
-                      "ik_smart": {
-                        "type": "ik",
-                        "use_smart": true
-                      },
                       "my_ngram_tokenizer" : {
                           "type" : "nGram",
                           "min_gram": "2",
@@ -88,43 +90,39 @@ curl -XPUT http://localhost:9200/my_company_v1?pretty=true -d '
     },
     "mappings":{
         "my_company_info":{
-            "_analyzer":{
-                "path":"lang"
-            },
             "_source":{
                 "excludes":[
                     "lang"
                 ]
             },
-            "dynamic":"strict",
+            "dynamic": false,
             "properties":{
                 "lang":{
-                    "type":"string",
-                    "index":"not_analyzed",
+                    "type":"keyword",
                     "store":"no"
                 },
                 "companyKey":{
-                    "type":"long",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "companyCode":{
-                    "type":"string",
-                    "analyzed":"code_analyzer"
+                    "type":"text",
+                    "analyzer":"mapping_analyzer"
                 },
                 "companyName":{
-                    "type":"multi_field",
+                    "type": "text",
+                    "analyzer": "ik_max_word",
+                    "boost": 10,
                     "fields": {
                         "pinyin": {
-                            "type": "string",
+                            "type": "text",
                             "store": "no",
                             "term_vector": "with_positions_offsets",
-                            "analyzer": "pinyin_analyzer",
-                            "boost": 10
+                            "analyzer": "pinyin_analyzer"
                         },
                         "raw": {
-                            "type": "string",
-                            "store": "yes",
-                            "analyzer": "ik_max_word"
+                            "type": "keyword",
+                            "store": "yes"
                         }
                     }
                 },
@@ -133,24 +131,24 @@ curl -XPUT http://localhost:9200/my_company_v1?pretty=true -d '
                     "format":"yyyy-MM-dd HH:mm:ss"
                 },
                 "business":{
-                    "type":"string",
-                    "analyzed":"ik_max_word"
+                    "type":"text",
+                    "analyzer":"ik_max_word"
                 },
                 "contactPhone":{
-                    "type":"string",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "contactName":{
-                    "type":"string",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "contactAddr":{
-                    "type":"string",
-                    "analyzed":"ik_max_word"
+                    "type":"text",
+                    "analyzer":"ik_max_word"
                 },
                 "logo":{
-                    "type":"string",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "sort":{
                     "type":"integer"
@@ -165,46 +163,42 @@ curl -XPUT http://localhost:9200/my_company_v1?pretty=true -d '
                     "type":"byte"
                 },
                 "province":{
-                    "type":"string",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                     "store":"yes"
                 },
                 "city":{
-                    "type":"string",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "area":{
-                    "type":"string",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                     "store":"yes"
                 },
                 "fabricClass":{
                     "properties":{
                         "name":{
-                            "type":"multi_field",
+                            "type": "text",
+                            "analyzer": "ik_max_word",
                             "fields": {
                                 "pinyin": {
-                                    "type": "string",
+                                    "type": "text",
                                     "store": "no",
                                     "term_vector": "with_positions_offsets",
                                     "analyzer": "pinyin_analyzer"
                                 },
                                 "raw": {
-                                    "type": "string",
-                                    "store": "yes",
-                                    "index": "not_analyzed"
+                                    "type": "keyword",
+                                    "store": "yes"
                                 }
                             }
                         },
                         "path":{
-                            "type":"multi_field",
+                            "type":"text",
+                            "analyzer": "ik_max_word",
                             "fields": {
                                 "tree": {
-                                    "type":"string",
-                                     "analyzed":"path_analyzer"
-                                },
-                                "raw": {
-                                    "type": "string",
-                                    "store": "no",
-                                    "analyzer": "ik"
+                                    "type":"text",
+                                     "analyzer":"path_analyzer"
                                 }
                             }
                         }

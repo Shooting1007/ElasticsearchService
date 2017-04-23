@@ -93,7 +93,6 @@ public class ManageServiceImpl implements IManageService {
         try{
             Client transportClient = client.getTransportClient();
             DeleteResponse response = transportClient.prepareDelete().setIndex("test_index")
-                    .setOperationThreaded(false)
                     .execute()
                     .actionGet();
         }catch (Exception e) {
@@ -137,7 +136,7 @@ public class ManageServiceImpl implements IManageService {
                 .setFlushInterval(TimeValue.timeValueSeconds(5))
                 .setConcurrentRequests(1)
                 .build();
-        bulkProcessor.add((IndexRequest) new IndexRequest("twitter", "tweet", "1").source(/* your doc here */));
+//        bulkProcessor.add((IndexRequest) new IndexRequest("twitter", "tweet", "1").source(/* your doc here */));
     }
 
 
