@@ -49,7 +49,7 @@
         <!-- DEBUG日志格式 -->
         <RollingFile name="debug_appender"
                                  immediateFlush="false" fileName="${LOG_HOME}/debug.log"
-                                 filePattern="${LOG_HOME}/ess.log.%d{yyyy-MM-dd}.debug.gz">
+                                 filePattern="${LOG_HOME}/debug.log.%d{yyyy-MM-dd}.debug.gz">
             <PatternLayout>
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %class{36} %L %M -- %msg%xEx%n</pattern>
             </PatternLayout>
@@ -62,8 +62,8 @@
     <Loggers>
         <!-- 配置日志的根节点 -->
         <root level="debug">
-            <appender-ref ref="Console"/>
-            <!--<appender-ref ref="service_appender"/>-->
+            <!--<appender-ref ref="Console"/>-->
+            <appender-ref ref="service_appender"/>
         </root>
 
         <!-- 第三方日志系统 -->
