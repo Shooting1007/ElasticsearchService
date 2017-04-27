@@ -16,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.ElasticsearchClient;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
@@ -28,7 +27,6 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.elasticsearch.search.fetch.subphase.highlight.Highlighter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,17 +127,17 @@ public class SearchServiceImpl implements ISearchService {
             srb.setFetchSource(returnFields,null);
 
             // TODO: 2017/3/29 转换查询参数
-//            Map<String, Object> builders ;
+            Map<String, BoolQueryBuilder> builders ;
             BoolQueryBuilder queryBuilder = null;
-//            BoolFilterBuilder filterBuilder = null;
+            BoolQueryBuilder filterBuilder = null;
             if (null != queryParams && queryParams.length > 0) {
-                queryBuilder = this.parseQuery(queryParams, origin);
-                /*if (builders.get("query") != null) {
-                    queryBuilder = (BoolQueryBuilder) builders.get("query");
-                }*/
-                /*if (builders.get("filter") != null) {
-                    filterBuilder = (BoolFilterBuilder) builders.get("filter");
-                }*/
+                builders = this.parseQuery(queryParams, origin);
+                if (builders.get("query") != null) {
+                    queryBuilder =  builders.get("query");
+                }
+                if (builders.get("filter") != null) {
+                    filterBuilder = builders.get("filter");
+                }
             }
             String defaultFilters = PropertiesUtil.getStringByKey("es." + origin + ".defaultFilters");
             /*BoolFilterBuilder defaultFilterBuilder = null;
@@ -166,7 +164,12 @@ public class SearchServiceImpl implements ISearchService {
             if (filterBuilder != null) {
                 srb.setPostFilter(filterBuilder);
             }*/
-            srb.setQuery(queryBuilder);
+            if(queryBuilder != null) {
+                srb.setQuery(queryBuilder);
+            }
+            if(filterBuilder != null) {
+                srb.setPostFilter(filterBuilder);
+            }
 
             //TODO 2017/3/29  设置聚合参数
             if (aggParams != null && aggParams.length > 0) {
@@ -174,6 +177,7 @@ public class SearchServiceImpl implements ISearchService {
                     srb.addAggregation(this.parseAggregation(aggParam, origin));
                 }
             }
+
             //TODO 2017/3/29  设置高亮
             if (highLightFields != null && highLightFields.length > 0) {
                 if (StringUtils.isEmpty(highLightTags)) {
@@ -223,9 +227,11 @@ public class SearchServiceImpl implements ISearchService {
      * @author shuting.wu
      * @date 2017/3/24 16:22
      **/
-    private BoolQueryBuilder parseQuery(QueryParam[] queryParams, String origin) throws Exception {
+    private Map<String,BoolQueryBuilder> parseQuery(QueryParam[] queryParams, String origin) throws Exception {
         BoolQueryBuilder boolQueryBuilder = null;
-        QueryBuilder queryBuilder;
+        BoolQueryBuilder boolFilterBuilder = null;
+        QueryBuilder queryBuilder = null;
+        QueryBuilder filterBuilder = null;
         SearchOperator searchOperate;
         SearchType searchType;
         Object value;
@@ -276,11 +282,14 @@ public class SearchServiceImpl implements ISearchService {
                         field = field + ".raw";
                     }
                     if (queryParam.isFilterMode()) {
-                        //filterBuilder = FilterBuilders.termsFilter(field, value.toString().split(","));
-                        queryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.termsQuery(field, value.toString().split(",")));
+                        //filterBuilder = FilterBuilders.termsFilter(field, value.toString().split(","));]
+                        filterBuilder = QueryBuilders.termsQuery(field, value.toString().split(","));
+//                        filterBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.termsQuery(field, value.toString().split(",")));
                     } else {
                         queryBuilder = QueryBuilders.termsQuery(field, value.toString().split(","));
+//                        queryBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.termsQuery(field, value.toString().split(",")));
                     }
+                    //filterBuilder = QueryBuilders.boolQuery().filter(QueryBuilders.termsQuery(field, value.toString().split(",")));
                     break;
                 case RANGE:
                     /*RangeFilterBuilder rangeFilterBuilder = FilterBuilders.rangeFilter(field);
@@ -315,52 +324,53 @@ public class SearchServiceImpl implements ISearchService {
                     //queryBuilder = QueryBuilders.nestedQuery(field.substring(0, field.lastIndexOf(".")), queryBuilder);
                     queryBuilder = QueryBuilders.nestedQuery(field.substring(0, field.lastIndexOf(".")), queryBuilder, ScoreMode.Max);
                 }
-                /*if (filterBuilder != null) {
-                    filterBuilder = FilterBuilders.nestedFilter(field.substring(0, field.lastIndexOf(".")), filterBuilder);
-                }*/
+                if (filterBuilder != null) {
+                    //filterBuilder = FilterBuilders.nestedFilter(field.substring(0, field.lastIndexOf(".")), filterBuilder);
+                    filterBuilder = QueryBuilders.nestedQuery(field.substring(0, field.lastIndexOf(".")), queryBuilder, ScoreMode.Max);
+                }
             }
 
             searchOperate = queryParam.getOperator();
             if (null != queryBuilder && null == boolQueryBuilder) {
                 boolQueryBuilder = new BoolQueryBuilder();
             }
-            /*if (null != filterBuilder && null == boolFilterBuilder) {
-                boolFilterBuilder = new BoolFilterBuilder();
-            }*/
+            if (null != filterBuilder && null == boolFilterBuilder) {
+                boolFilterBuilder = new BoolQueryBuilder();
+            }
             switch (searchOperate) {
                 case AND:
                     if (null != queryBuilder) {
                         boolQueryBuilder.must(queryBuilder);
                     }
-                    /*if (null != filterBuilder) {
+                    if (null != filterBuilder) {
                         boolFilterBuilder.must(filterBuilder);
-                    }*/
+                    }
                     break;
                 case OR:
                     if (null != queryBuilder) {
                         boolQueryBuilder.should(queryBuilder);
                     }
-                    /*if (null != filterBuilder) {
+                    if (null != filterBuilder) {
                         boolFilterBuilder.should(filterBuilder);
-                    }*/
+                    }
                     break;
                 case NOT:
                     if (null != queryBuilder) {
                         boolQueryBuilder.mustNot(queryBuilder);
                     }
-                    /*if (null != filterBuilder) {
+                    if (null != filterBuilder) {
                         boolFilterBuilder.mustNot(filterBuilder);
-                    }*/
+                    }
                     break;
                 default:
                     break;
             }
 
         }
-//        Map<String, Object> builders = new HashMap<String, Object>();
-//        builders.put("query", boolQueryBuilder);
-//        builders.put("filter", boolFilterBuilder);
-        return boolQueryBuilder;
+        Map<String, BoolQueryBuilder> builders = new HashMap<>();
+        builders.put("query", boolQueryBuilder);
+        builders.put("filter", boolFilterBuilder);
+        return builders;
     }
 
 

@@ -5,7 +5,7 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>es</baseDirectory>
+    <baseDirectory>ess</baseDirectory>
 
     <fileSets>
         <fileSet>

@@ -140,24 +140,24 @@ curl -XPUT http://localhost:9200/my_fabric_v1?pretty=true -d '
                     "format":"yyyy-MM-dd HH:mm:ss"
                 },
                 "yarnCount":{
-                    "type":"text",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "weight":{
-                    "type":"text",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "width":{
-                    "type":"text",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "density":{
-                    "type":"text",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "serial":{
-                    "type":"text",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "compsnDesc":{
                     "type":"text",
@@ -194,16 +194,16 @@ curl -XPUT http://localhost:9200/my_fabric_v1?pretty=true -d '
                     "type":"byte"
                 },
                 "province":{
-                    "type":"text",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "city":{
-                    "type":"text",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "area":{
-                    "type":"text",
-                    "index":"not_analyzed"
+                    "type":"keyword",
+                    "store":"yes"
                 },
                 "weave":{
                     "type":"text",
@@ -223,8 +223,8 @@ curl -XPUT http://localhost:9200/my_fabric_v1?pretty=true -d '
                     }
                 },
                 "companyKey":{
-                    "type":"keyword",
-                    "store":"true"
+                    "type":"text",
+                    "store":"strict_analyzer"
                 },
                 "customerTag":{
                     "type":"text",
@@ -248,10 +248,12 @@ curl -XPUT http://localhost:9200/my_fabric_v1?pretty=true -d '
                 },
                 "tag":{
                     "type":"text",
+                    "fielddata": true,
                     "analyzer":"strict_analyzer"
                 },
                 "sex":{
                     "type":"text",
+                    "fielddata": true,
                     "analyzer":"ik_and_word"
                 },
                 "compsn":{
