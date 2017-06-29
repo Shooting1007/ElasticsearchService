@@ -66,4 +66,17 @@ public class JsonStrUtils {
         return objectMapper.readValue(jsonStr, clazz);
     }
 
+    /**
+     * 对象转字符串
+     * @param o
+     * @return
+     * @throws Exception
+     */
+    public static String objectToStr(Object o) throws Exception {
+        if (objectMapper == null) {
+            objectMapper = new ObjectMapper();
+        }
+        return objectMapper.writeValueAsString(o);
+    }
+
 }

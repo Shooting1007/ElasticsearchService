@@ -3,9 +3,12 @@ package com.qishon.es.common;/**
  */
 
 import com.qishon.es.enums.SearchType;
+import com.qishon.es.enums.SortType;
 import com.qishon.es.pojo.AggParam;
 import com.qishon.es.pojo.QueryParam;
+import com.qishon.es.pojo.SortParam;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.search.sort.SortOrder;
 
 /**
  * @author shuting.wu
@@ -13,16 +16,21 @@ import org.apache.commons.lang.StringUtils;
  **/
 public class ParamsUtils {
 
-    public static QueryParam[] parseRange(String range) throws Exception{
+    /**
+     * @param range format:field[lower,upper],field(,upper)...
+     * @return
+     * @throws Exception
+     */
+    public static QueryParam[] parseRange(String range) throws Exception {
         String[] ranges = RegexpUtils.getArrayByPattern(range, "pattern.param.range");
-        String[] op ;
-        QueryParam rangeParam ;
+        String[] op;
+        QueryParam rangeParam;
         QueryParam[] rangeParams = new QueryParam[ranges.length];
         for (int i = 0; i < ranges.length; i++) {
             String rp = ranges[i];
             rangeParam = new QueryParam();
             op = RegexpUtils.getArrayByPattern(rp, "pattern.param.rangeOp");
-            rangeParam.setQueryField(StringUtils.substringBefore(rp,op[0]));
+            rangeParam.setQueryField(StringUtils.substringBefore(rp, op[0]));
             QueryParam.RangeParam r = rangeParam.new RangeParam();
             r.setLower(StringUtils.substring(rp, rp.indexOf(op[0]) + 1, rp.indexOf(",")));
             r.setUpper(StringUtils.substring(rp, rp.indexOf(",") + 1, rp.indexOf(op[1])));
@@ -39,8 +47,14 @@ public class ParamsUtils {
         return rangeParams;
     }
 
-    public static AggParam[] parseAggFields(String aggFields,String aggSize) throws Exception{
-        AggParam[] aggParams ;
+    /**
+     * @param aggFields,format:f1,f2,....
+     * @param aggSize
+     * @return
+     * @throws Exception
+     */
+    public static AggParam[] parseAggFields(String aggFields, String aggSize) throws Exception {
+        AggParam[] aggParams;
         String[] fields = aggFields.split(",");
         aggParams = new AggParam[fields.length];
         AggParam aggParam;
@@ -56,6 +70,66 @@ public class ParamsUtils {
             aggParams[i] = aggParam;
         }
         return aggParams;
+    }
+
+    /**
+     * 解析字段排序，格式 field|sort,field|sort..
+     * @param sort
+     * @return
+     * @throws Exception
+     */
+    public static SortParam[] parseSorts(String sort) throws Exception {
+        SortParam[] sortParams = null;
+        String[] sortArray = sort.split(",");
+        if (sortArray != null && sortArray.length > 0) {
+            sortParams = new SortParam[sortArray.length];
+            SortParam sortParam;
+            for (int i = 0; i < sortArray.length; i++) {
+                sortParam = new SortParam();
+                sortParam.setField(sortArray[i].split("\\|")[0]);
+                sortParam.setOrder(SortOrder.fromString(sortArray[i].split("\\|")[1]));
+                sortParams[i] = sortParam;
+            }
+        }
+        return sortParams;
+    }
+
+    /**
+     * 解析优先级排序，格式：field,value|field,value...
+     * @param sortPriority
+     * @return
+     */
+    public static SortParam[] parseSortPriority(String sortPriority) {
+        SortParam[] sortParams = null;
+        String[] sortArray = sortPriority.split("\\|");
+        if (sortArray != null && sortArray.length > 0) {
+            sortParams = new SortParam[sortArray.length];
+            SortParam sortParam;
+            for (int i = 0; i < sortArray.length; i++) {
+                sortParam = new SortParam();
+                sortParam.setSortType(SortType.SCRIPT);
+                sortParam.setField(sortArray[i].split(",")[0]);
+                sortParam.setPriorValue(sortArray[i].split(",")[1]);
+                sortParams[i] = sortParam;
+            }
+        }
+        return sortParams;
+    }
+
+    /**
+     * 生成排序优先级的脚本，默认使用painless
+     * @param field
+     * @param paramKey
+     * @return
+     */
+    public static String geteSortScript(String field,String paramKey) {
+        StringBuffer result = new StringBuffer();
+        result.append("doc");
+        result.append("['").append(field).append("']");
+        result.append(".values.contains");
+        result.append("(").append("params.").append(paramKey).append(")");
+        result.append("?0:1");
+        return result.toString();
     }
 
 }

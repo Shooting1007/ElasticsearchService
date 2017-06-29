@@ -2,6 +2,7 @@
  * Created by shuting.wu on 2017/4/7.
  */
 
+import com.qishon.es.servlet.HistorySuggestServlet;
 import com.qishon.es.servlet.SearchServlet;
 import com.qishon.es.servlet.SimpleSearchServlet;
 import org.eclipse.jetty.server.Server;
@@ -48,6 +49,7 @@ public class ElasticServer {
 
         context.addServlet(new ServletHolder(new SearchServlet()), "/search/advanced");
         context.addServlet(new ServletHolder(new SimpleSearchServlet()), "/search/simple");
+        context.addServlet(new ServletHolder(new HistorySuggestServlet()), "/suggest/history");
 
         server.start();
         server.join();
